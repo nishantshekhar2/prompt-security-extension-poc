@@ -235,26 +235,48 @@ function extMsg(payload, ms = 8000) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
-// EXTENSION DETECTION via externally_connectable probe
-// Works regardless of whether script.bundle.js was injected on this
-// page. psScriptExecuted is unreliable — only set on monitored domains.
-// Instead we probe via chrome.runtime.sendMessage directly.
+// EXTENSION DETECTION — 3-layer probe, most reliable first
+//
+// Layer 1: Web-accessible resource image load (no service worker needed)
+//   prompt_logo.png is listed in web_accessible_resources with
+//   matches: ["<all_urls>"] — loads iff extension is installed.
+//   Works regardless of service worker state, domain monitoring, caching.
+//
+// Layer 2: chrome.runtime.sendMessage probe (wakes sleeping SW)
+//
+// Layer 3: psScriptExecuted DOM flag (only if script.bundle.js injected)
 // ══════════════════════════════════════════════════════════════════════
-async function detectExtension() {
-    // Try a lightweight callShouldInspectChat — extension responds even
-    // when the domain is not monitored, proving it's installed.
-    if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return false;
-    const r = await extMsg({
-        message: "callShouldInspectChat",
-        url: "https://chatgpt.com/api/chat",
-        body: '{"messages":[]}',
-        pageUrl: "https://chatgpt.com",
-        pageTitle: "ChatGPT",
-        optionalFavicons: [], inputTypes: [],
-        ctx: { flowTraceId: crypto.randomUUID() }
-    }, 5000);
-    // Any non-null response (including false/null from backend) means extension IS installed
-    return r !== null && r?._extError === undefined;
+function detectExtension() {
+    return new Promise(resolve => {
+        // Layer 1 — fastest and most reliable: load web-accessible resource
+        // If image loads → extension installed. If 404/error → not installed.
+        const img = new Image();
+        let resolved = false;
+        const done = (v) => { if (!resolved) { resolved = true; resolve(v); } };
+
+        img.onload  = () => done(true);
+        img.onerror = () => {
+            // Layer 2 — sendMessage probe (wakes service worker)
+            if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) {
+                // Layer 3 — DOM flag
+                done(document.documentElement.dataset.psScriptExecuted === "true");
+                return;
+            }
+            chrome.runtime.sendMessage(EXT_ID,
+                { message: "addLog", location: "probe", log: "ping", ctx: { flowTraceId: crypto.randomUUID() } },
+                () => {
+                    const err = chrome.runtime?.lastError?.message || "";
+                    // "does not exist" = not installed; any other response = installed
+                    const installed = !err.includes("not exist") && !err.includes("not installed");
+                    done(installed || document.documentElement.dataset.psScriptExecuted === "true");
+                }
+            );
+        };
+
+        img.src = `chrome-extension://${EXT_ID}/images/prompt_logo.png`;
+        // Failsafe timeout
+        setTimeout(() => done(document.documentElement.dataset.psScriptExecuted === "true"), 4000);
+    });
 }
 
 // ══════════════════════════════════════════════════════════════════════
